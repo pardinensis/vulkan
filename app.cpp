@@ -46,9 +46,17 @@ void App::init(const std::string& app_name) {
     // create framebuffers
     vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
 
+    // create vertex buffer
+    std::vector<VulkanVertex> vertexData = {
+        {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+        {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 1.0f}},
+        {{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f, 1.0f}}
+    };
+    vulkanVertexBuffer = new VulkanVertexBuffer(*vulkanPhysicalDevice, *vulkanDevice, vertexData);
+
     // create command buffers
     vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
-        *vulkanFramebuffers, vulkanPhysicalDevice->getGraphicsFamily());
+        *vulkanFramebuffers, vulkanPhysicalDevice->getGraphicsFamily(), *vulkanVertexBuffer);
 
     // create semaphores
     vulkanSemaphoreImageAquired = new VulkanSemaphore(*vulkanDevice);
@@ -82,6 +90,7 @@ void App::cleanup() {
 
     delete vulkanSemaphoreRenderFinished;
     delete vulkanSemaphoreImageAquired;
+    delete vulkanVertexBuffer;
     delete vulkanCommandBuffers;
     delete vulkanFramebuffers;
     delete vulkanPipeline;
@@ -111,7 +120,7 @@ void App::recreateSwapchain() {
     vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader);
     vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
     vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
-        *vulkanFramebuffers, vulkanPhysicalDevice->getGraphicsFamily());
+        *vulkanFramebuffers, vulkanPhysicalDevice->getGraphicsFamily(), *vulkanVertexBuffer);
 }
 
 void App::onWindowResized(GLFWwindow* window, int width, int height) {

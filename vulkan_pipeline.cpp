@@ -1,15 +1,20 @@
 #include "vulkan_pipeline.hpp"
 
+#include "vulkan_vertex.hpp"
+
 VulkanPipeline::VulkanPipeline(const VulkanDevice& device, const VulkanRenderPass& renderPass, const VkExtent2D& vkExtent, const VulkanShader& shader) 
 		: device(device) {
 
 	// setup vertex input format
+	auto bindingDescription = VulkanVertex::getBindingDescription();
+	auto attributeDescriptions = VulkanVertex::getAttributeDescriptions();
+
 	VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
 	vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
-	vertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr; // Optional
-	vertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputStateCreateInfo.pVertexAttributeDescriptions = nullptr; // Optional
+	vertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
+	vertexInputStateCreateInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());;
+	vertexInputStateCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo = {};
 	inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

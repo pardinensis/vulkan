@@ -1,7 +1,8 @@
 #include "vulkan_command_buffers.hpp"
 
 
-VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const VulkanRenderPass& renderPass, const VulkanPipeline& pipeline, const VulkanFramebuffers& framebuffers, int graphicsFamily)
+VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const VulkanRenderPass& renderPass,
+		const VulkanPipeline& pipeline, const VulkanFramebuffers& framebuffers, int graphicsFamily, const VulkanVertexBuffer& vertexBuffer)
 		: device(device) {
 	const VkDevice& vkDevice = device.getVkDevice();
 
@@ -47,7 +48,12 @@ VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const Vul
 		
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getVkPipeline());
-		vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+
+		VkBuffer vertexBuffers[] = { vertexBuffer.getVkBuffer() };
+		VkDeviceSize vertexOffsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, vertexOffsets);
+		vkCmdDraw(commandBuffers[i], vertexBuffer.getVertexCount(), 1, 0, 0);
+		
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {

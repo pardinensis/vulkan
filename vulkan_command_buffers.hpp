@@ -4,6 +4,7 @@
 #include "vulkan_device.hpp"
 #include "vulkan_framebuffers.hpp"
 #include "vulkan_pipeline.hpp"
+#include "vulkan_vertex_buffer.hpp"
 
 class VulkanCommandBuffers {
 private:
@@ -14,7 +15,7 @@ private:
 
 public:
 	VulkanCommandBuffers(const VulkanDevice& device, const VulkanRenderPass& renderPass, const VulkanPipeline& pipeline,
-		const VulkanFramebuffers& framebuffers, int graphicsFamily);
+		const VulkanFramebuffers& framebuffers, int graphicsFamily, const VulkanVertexBuffer& vertexBuffer);
 	~VulkanCommandBuffers();
 
 	void submit(uint32_t imageIndex, const VulkanSemaphore& imageAquiredSemaphore, const VulkanSemaphore& renderFinishedSemaphore);

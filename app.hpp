@@ -11,6 +11,8 @@
 #include "vulkan_semaphore.hpp"
 #include "vulkan_shader.hpp"
 #include "vulkan_swapchain.hpp"
+#include "vulkan_vertex.hpp"
+#include "vulkan_vertex_buffer.hpp"
 
 class App {
 private:
@@ -25,6 +27,7 @@ private:
     VulkanShader* vulkanShader;
     VulkanPipeline* vulkanPipeline;
     VulkanFramebuffers* vulkanFramebuffers;
+    VulkanVertexBuffer* vulkanVertexBuffer;
     VulkanCommandBuffers* vulkanCommandBuffers;
     VulkanSemaphore* vulkanSemaphoreImageAquired;
     VulkanSemaphore* vulkanSemaphoreRenderFinished;
