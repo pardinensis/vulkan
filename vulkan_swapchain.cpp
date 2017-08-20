@@ -126,6 +126,24 @@ VkExtent2D VulkanSwapchain::chooseExtent() {
 	return actualExtent;
 }
 
-std::shared_ptr<VulkanSwapchain> VulkanSwapchain::create(const VulkanPhysicalDevice& vulkanPhysicalDevice, const VulkanDevice& vulkanDevice, const VkSurfaceKHR& surface) {
-	return std::make_shared<VulkanSwapchain>(vulkanPhysicalDevice, vulkanDevice, surface);
+uint32_t VulkanSwapchain::aquireNextImage(const VulkanSemaphore& imageAquiredSemaphore) {
+	uint32_t imageIndex;
+	vkAcquireNextImageKHR(vulkanDevice.getVkDevice(), swapchain,
+		std::numeric_limits<uint64_t>::max(), imageAquiredSemaphore.getVkSemaphore(), VK_NULL_HANDLE, &imageIndex);
+	return imageIndex;
+}
+
+void VulkanSwapchain::presentImage(uint32_t imageIndex, const VulkanSemaphore &renderFinishedSemaphore) {
+	VkSwapchainKHR swapchains[] = { swapchain };
+	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore.getVkSemaphore() };
+
+	VkPresentInfoKHR presentInfo = {};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = signalSemaphores;
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapchains;
+	presentInfo.pImageIndices = &imageIndex;
+	presentInfo.pResults = nullptr;
+	vkQueuePresentKHR(vulkanDevice.getVkPresentQueue(), &presentInfo);
 }

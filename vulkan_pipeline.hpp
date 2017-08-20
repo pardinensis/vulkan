@@ -3,30 +3,21 @@
 #include "common_includes.hpp"
 #include "vulkan_device.hpp"
 #include "vulkan_physical_device.hpp"
-#include "vulkan_shader_module.hpp"
-#include "vulkan_swapchain.hpp"
+#include "vulkan_render_pass.hpp"
+#include "vulkan_shader.hpp"
 
 class VulkanPipeline {
 private:
-	const VulkanDevice& vulkanDevice;
-	const VulkanSwapchain& vulkanSwapchain;
+	const VulkanDevice& device;
 
 	VkPipelineLayout pipelineLayout;
-	VkRenderPass renderPass;
 	VkPipeline pipeline;
-	std::vector<VkFramebuffer> framebuffers;
-	VkCommandPool commandPool;
-	std::vector<VkCommandBuffer> commandBuffers;
-
-	VkSemaphore imageAvailableSemaphore;
-	VkSemaphore renderFinishedSemaphore;
 
 public:
-	VulkanPipeline(const VulkanPhysicalDevice& physicalDevice, const VulkanDevice& vulkanDevice, const VulkanSwapchain& vulkanSwapchain);
+	VulkanPipeline(const VulkanDevice& device, const VulkanRenderPass& renderPass, const VkExtent2D& vkExtent, const VulkanShader& shader);
 	~VulkanPipeline();
 
 	void drawFrame();
 
-public:
-	static std::shared_ptr<VulkanPipeline> create(const VulkanPhysicalDevice& physicalDevice, const VulkanDevice& vulkanDevice, const VulkanSwapchain& vulkanSwapchain);
+	const VkPipeline& getVkPipeline() const { return pipeline; }
 };

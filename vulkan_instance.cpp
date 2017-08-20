@@ -73,7 +73,3 @@ VulkanInstance::~VulkanInstance() {
     // destroy instance
     vkDestroyInstance(instance, nullptr);
 }
-
-std::shared_ptr<VulkanInstance> VulkanInstance::create() {
-	return std::make_shared<VulkanInstance>();
-}

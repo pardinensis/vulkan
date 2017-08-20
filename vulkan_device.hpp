@@ -16,7 +16,4 @@ public:
 	const VkDevice& getVkDevice() const { return device; }
 	const VkQueue& getVkGraphicsQueue() const { return graphicsQueue; }
 	const VkQueue& getVkPresentQueue() const { return presentQueue; }
-
-public:
-	static std::shared_ptr<VulkanDevice> create(VulkanPhysicalDevice& physicalDevice);
 };

@@ -32,5 +32,5 @@ public:
 	bool isSuitable();
 
 public:
-	static std::shared_ptr<VulkanPhysicalDevice> choosePhysicalDevice(const VulkanInstance& vulkanInstance, const VkSurfaceKHR& vkSurface);
+	static VulkanPhysicalDevice* choosePhysicalDevice(const VulkanInstance& vulkanInstance, const VkSurfaceKHR& vkSurface);
 };

@@ -3,6 +3,7 @@
 #include "common_includes.hpp"
 #include "vulkan_device.hpp"
 #include "vulkan_physical_device.hpp"
+#include "vulkan_semaphore.hpp"
 
 class VulkanSwapchain {
 private:
@@ -20,6 +21,9 @@ public:
 	VulkanSwapchain(const VulkanPhysicalDevice& vulkanPhysicalDevice, const VulkanDevice& vulkanDevice, const VkSurfaceKHR& surface);
 	~VulkanSwapchain();
 
+	uint32_t aquireNextImage(const VulkanSemaphore& imageAquiredSemaphore);
+	void presentImage(uint32_t imageIndex, const VulkanSemaphore& renderFinishedSemaphore);
+
 	const VkSwapchainKHR getVkSwapchain() const { return swapchain; }
 	const VkFormat& getVkFormat() const { return swapchainImageFormat; }
 	const VkExtent2D& getVkExtent() const { return swapchainExtent; }
@@ -29,7 +33,4 @@ private:
 	VkSurfaceFormatKHR chooseSurfaceFormat();
 	VkPresentModeKHR choosePresentMode();
 	VkExtent2D chooseExtent();
-
-public:
-	static std::shared_ptr<VulkanSwapchain> create(const VulkanPhysicalDevice& vulkanPhysicalDevice, const VulkanDevice& vulkanDevice, const VkSurfaceKHR& surface);
 };

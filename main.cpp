@@ -6,6 +6,7 @@ int main() {
 	try {
 		app.init("Vulkan");
 		app.run();
+		app.cleanup();
 	}
 	catch (const std::runtime_error& e) {
 		std::cerr << e.what() << std::endl;

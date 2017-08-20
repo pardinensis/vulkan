@@ -74,7 +74,7 @@ bool VulkanPhysicalDevice::isSuitable() {
 	return true;
 }
 
-std::shared_ptr<VulkanPhysicalDevice> VulkanPhysicalDevice::choosePhysicalDevice(const VulkanInstance& vulkanInstance, const VkSurfaceKHR& vkSurface) {
+VulkanPhysicalDevice* VulkanPhysicalDevice::choosePhysicalDevice(const VulkanInstance& vulkanInstance, const VkSurfaceKHR& vkSurface) {
 	unsigned int physicalDeviceCount = 0;
 	vkEnumeratePhysicalDevices(vulkanInstance.getVkInstance(), &physicalDeviceCount, nullptr);
 
@@ -86,11 +86,13 @@ std::shared_ptr<VulkanPhysicalDevice> VulkanPhysicalDevice::choosePhysicalDevice
 	vkEnumeratePhysicalDevices(vulkanInstance.getVkInstance(), &physicalDeviceCount, vkPhysicalDevices.data());
 
 	for (const VkPhysicalDevice& vkPhysicalDevice : vkPhysicalDevices) {
-		std::shared_ptr<VulkanPhysicalDevice> physicalDevice = std::make_shared<VulkanPhysicalDevice>(vkPhysicalDevice, vkSurface);
+		VulkanPhysicalDevice* physicalDevice = new VulkanPhysicalDevice(vkPhysicalDevice, vkSurface);
 
 		if (physicalDevice->isSuitable()) {
 			return physicalDevice;
 		}
+
+		delete physicalDevice;
 	}
 
 	throw std::runtime_error("failed to find a suitable GPU");

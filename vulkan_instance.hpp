@@ -13,7 +13,4 @@ public:
 	~VulkanInstance();
 
 	const VkInstance& getVkInstance() const { return instance; }
-
-public:
-	static std::shared_ptr<VulkanInstance> create();
 };

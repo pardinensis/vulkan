@@ -46,7 +46,3 @@ VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice) {
 VulkanDevice::~VulkanDevice() {
 	vkDestroyDevice(device, nullptr);
 }
-
-std::shared_ptr<VulkanDevice> VulkanDevice::create(VulkanPhysicalDevice& physicalDevice) {
-	return std::make_shared<VulkanDevice>(physicalDevice);
-}

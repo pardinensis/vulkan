@@ -21,7 +21,7 @@ VulkanShaderModule::VulkanShaderModule(const std::string& filename, const Vulkan
 	shaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(buffer.data());
 	if (vkCreateShaderModule(vulkanDevice.getVkDevice(), &shaderModuleCreateInfo, nullptr, &shaderModule) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create shader module");
-	} 
+	}
 }
 
 VulkanShaderModule::~VulkanShaderModule() {
