@@ -8,8 +8,11 @@ void App::init(const std::string& app_name) {
 
 	// create window
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
+
+    glfwSetWindowUserPointer(window, this);
+    glfwSetWindowSizeCallback(window, App::onWindowResized);
 
     // create vulkan instance
     vulkanInstance = new VulkanInstance();
@@ -26,7 +29,8 @@ void App::init(const std::string& app_name) {
     vulkanDevice = new VulkanDevice(*vulkanPhysicalDevice);
 
     // create swapchain
-    vulkanSwapchain = new VulkanSwapchain(*vulkanPhysicalDevice, *vulkanDevice, surface);
+    VkExtent2D preferredExtent = { WINDOW_WIDTH, WINDOW_HEIGHT };
+    vulkanSwapchain = new VulkanSwapchain(*vulkanPhysicalDevice, *vulkanDevice, surface, preferredExtent);
 
     // create render pass
     vulkanRenderPass = new VulkanRenderPass(*vulkanDevice, vulkanSwapchain->getVkFormat());
@@ -56,15 +60,26 @@ void App::run() {
 		glfwPollEvents();
 
         vkQueueWaitIdle(vulkanDevice->getVkPresentQueue());
+        
         uint32_t imageIndex = vulkanSwapchain->aquireNextImage(*vulkanSemaphoreImageAquired);
-        vulkanCommandBuffers->submit(imageIndex, *vulkanSemaphoreImageAquired, *vulkanSemaphoreRenderFinished);
-        vulkanSwapchain->presentImage(imageIndex, *vulkanSemaphoreRenderFinished);
-    }
+        if (imageIndex == -1) {
+            recreateSwapchain();
+            continue;
+        }
 
-    vkDeviceWaitIdle(vulkanDevice->getVkDevice());
+        vulkanCommandBuffers->submit(imageIndex, *vulkanSemaphoreImageAquired, *vulkanSemaphoreRenderFinished);
+
+        imageIndex = vulkanSwapchain->presentImage(imageIndex, *vulkanSemaphoreRenderFinished);
+        if (imageIndex == -1) {
+            recreateSwapchain();
+            continue;
+        }
+    }
 }
 
 void App::cleanup() {
+    vkDeviceWaitIdle(vulkanDevice->getVkDevice());
+
     delete vulkanSemaphoreRenderFinished;
     delete vulkanSemaphoreImageAquired;
     delete vulkanCommandBuffers;
@@ -76,4 +91,33 @@ void App::cleanup() {
     delete vulkanDevice;
     delete vulkanPhysicalDevice;
     delete vulkanInstance;
+}
+
+void App::recreateSwapchain() {
+    vkDeviceWaitIdle(vulkanDevice->getVkDevice());
+
+    delete vulkanCommandBuffers;
+    delete vulkanFramebuffers;
+    delete vulkanPipeline;
+    delete vulkanRenderPass;
+    delete vulkanSwapchain;
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    VkExtent2D actualExtent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+
+    vulkanSwapchain = new VulkanSwapchain(*vulkanPhysicalDevice, *vulkanDevice, surface, actualExtent);
+    vulkanRenderPass = new VulkanRenderPass(*vulkanDevice, vulkanSwapchain->getVkFormat());
+    vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader);
+    vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
+    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
+        *vulkanFramebuffers, vulkanPhysicalDevice->getGraphicsFamily());
+}
+
+void App::onWindowResized(GLFWwindow* window, int width, int height) {
+    if (width == 0 || height == 0)
+        return;
+
+    App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+    app->recreateSwapchain();
 }

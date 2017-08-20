@@ -2,12 +2,13 @@
 
 #include "config.hpp"
 
-VulkanSwapchain::VulkanSwapchain(const VulkanPhysicalDevice& vulkanPhysicalDevice, const VulkanDevice& vulkanDevice, const VkSurfaceKHR& surface)
+VulkanSwapchain::VulkanSwapchain(const VulkanPhysicalDevice& vulkanPhysicalDevice, const VulkanDevice& vulkanDevice, const VkSurfaceKHR& surface, const VkExtent2D& preferredExtent)
 		: vulkanPhysicalDevice(vulkanPhysicalDevice), vulkanDevice(vulkanDevice) {
+
 
 	VkSurfaceFormatKHR surfaceFormat = chooseSurfaceFormat();
 	VkPresentModeKHR presentMode = choosePresentMode();
-	VkExtent2D extent = chooseExtent();
+	VkExtent2D extent = chooseExtent(preferredExtent);
 
 	// set image count
 	const VkSurfaceCapabilitiesKHR& capabilities = vulkanPhysicalDevice.getSurfaceCapabilities();
@@ -114,26 +115,35 @@ VkPresentModeKHR VulkanSwapchain::choosePresentMode() {
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D VulkanSwapchain::chooseExtent() {
+VkExtent2D VulkanSwapchain::chooseExtent(const VkExtent2D& preferredExtent) {
 	const VkSurfaceCapabilitiesKHR& capabilities = vulkanPhysicalDevice.getSurfaceCapabilities();
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		return capabilities.currentExtent;
+		// return capabilities.currentExtent;
 	}
 
-	VkExtent2D actualExtent = {WINDOW_WIDTH, WINDOW_HEIGHT};
-	actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
-	actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
+	VkExtent2D actualExtent = preferredExtent;
+	// actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
+	// actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
 	return actualExtent;
 }
 
 uint32_t VulkanSwapchain::aquireNextImage(const VulkanSemaphore& imageAquiredSemaphore) {
 	uint32_t imageIndex;
-	vkAcquireNextImageKHR(vulkanDevice.getVkDevice(), swapchain,
+	VkResult result = vkAcquireNextImageKHR(vulkanDevice.getVkDevice(), swapchain,
 		std::numeric_limits<uint64_t>::max(), imageAquiredSemaphore.getVkSemaphore(), VK_NULL_HANDLE, &imageIndex);
-	return imageIndex;
+
+	switch (result) {
+		case VK_SUBOPTIMAL_KHR:
+		case VK_ERROR_OUT_OF_DATE_KHR:
+			return -1;
+		case VK_SUCCESS:
+			return imageIndex;
+		default:
+			throw std::runtime_error("failed to aquire swapchain image");
+	}
 }
 
-void VulkanSwapchain::presentImage(uint32_t imageIndex, const VulkanSemaphore &renderFinishedSemaphore) {
+uint32_t VulkanSwapchain::presentImage(uint32_t imageIndex, const VulkanSemaphore &renderFinishedSemaphore) {
 	VkSwapchainKHR swapchains[] = { swapchain };
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore.getVkSemaphore() };
 
@@ -145,5 +155,15 @@ void VulkanSwapchain::presentImage(uint32_t imageIndex, const VulkanSemaphore &r
 	presentInfo.pSwapchains = swapchains;
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr;
-	vkQueuePresentKHR(vulkanDevice.getVkPresentQueue(), &presentInfo);
+
+	VkResult result = vkQueuePresentKHR(vulkanDevice.getVkPresentQueue(), &presentInfo);
+	switch (result) {
+		case VK_ERROR_OUT_OF_DATE_KHR:
+			return -1;
+		case VK_SUCCESS:
+		case VK_SUBOPTIMAL_KHR:
+			return imageIndex;
+		default:
+			throw std::runtime_error("failed to present swapchain image");
+	}
 }

@@ -18,11 +18,11 @@ private:
 
 
 public:
-	VulkanSwapchain(const VulkanPhysicalDevice& vulkanPhysicalDevice, const VulkanDevice& vulkanDevice, const VkSurfaceKHR& surface);
+	VulkanSwapchain(const VulkanPhysicalDevice& vulkanPhysicalDevice, const VulkanDevice& vulkanDevice, const VkSurfaceKHR& surface, const VkExtent2D& preferredExtent);
 	~VulkanSwapchain();
 
 	uint32_t aquireNextImage(const VulkanSemaphore& imageAquiredSemaphore);
-	void presentImage(uint32_t imageIndex, const VulkanSemaphore& renderFinishedSemaphore);
+	uint32_t presentImage(uint32_t imageIndex, const VulkanSemaphore& renderFinishedSemaphore);
 
 	const VkSwapchainKHR getVkSwapchain() const { return swapchain; }
 	const VkFormat& getVkFormat() const { return swapchainImageFormat; }
@@ -32,5 +32,5 @@ public:
 private:
 	VkSurfaceFormatKHR chooseSurfaceFormat();
 	VkPresentModeKHR choosePresentMode();
-	VkExtent2D chooseExtent();
+	VkExtent2D chooseExtent(const VkExtent2D& preferredExtent);
 };

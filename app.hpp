@@ -29,6 +29,10 @@ private:
     VulkanSemaphore* vulkanSemaphoreImageAquired;
     VulkanSemaphore* vulkanSemaphoreRenderFinished;
 
+private:
+    void recreateSwapchain();
+    static void onWindowResized(GLFWwindow* window, int width, int height);
+
 public:
 	void init(const std::string& app_name);
 	void run();

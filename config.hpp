@@ -1,7 +1,7 @@
 #pragma once
 
 const char* const WINDOW_NAME = "Vulkan";
-const unsigned int WINDOW_WIDTH = 800;
+const unsigned int WINDOW_WIDTH = 900;
 const unsigned int WINDOW_HEIGHT = 600;
 
 const char* const APPLICATION_NAME = "Vulkan";
