@@ -3,52 +3,25 @@
 VulkanVertexBuffer::VulkanVertexBuffer(const VulkanPhysicalDevice& physicalDevice, const VulkanDevice& device, const std::vector<VulkanVertex>& vertexData)
 		: physicalDevice(physicalDevice), device(device), vertexData(vertexData) {
 
-	VkBufferCreateInfo bufferCreateInfo = {};
-	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferCreateInfo.size = sizeof(VulkanVertex) * vertexData.size();
-	bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-	if (vkCreateBuffer(device.getVkDevice(), &bufferCreateInfo, nullptr, &vertexBuffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create vertex buffer");
-	}
-
-	VkMemoryRequirements memoryRequirements;
-	vkGetBufferMemoryRequirements(device.getVkDevice(), vertexBuffer, &memoryRequirements);
-
-	VkMemoryAllocateInfo memoryAllocateInfo = {};
-	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memoryAllocateInfo.allocationSize = memoryRequirements.size;
-	memoryAllocateInfo.memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits,
+	// create staging buffer
+	VkDeviceSize bufferSize = sizeof(vertexData[0]) * vertexData.size();
+	VulkanBuffer stagingBuffer(physicalDevice, device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	if (vkAllocateMemory(device.getVkDevice(), &memoryAllocateInfo, nullptr, &deviceMemory) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate vertex buffer memory");
-	}
 
-	vkBindBufferMemory(device.getVkDevice(), vertexBuffer, deviceMemory, 0);
-
+	// copy data
 	void* data;
-	vkMapMemory(device.getVkDevice(), deviceMemory, 0, bufferCreateInfo.size, 0, &data);
-	std::memcpy(data, vertexData.data(), static_cast<size_t>(bufferCreateInfo.size));
-	vkUnmapMemory(device.getVkDevice(), deviceMemory);
+	vkMapMemory(device.getVkDevice(), stagingBuffer.getVkDeviceMemory(), 0, bufferSize, 0, &data);
+	std::memcpy(data, vertexData.data(), static_cast<size_t>(bufferSize));
+	vkUnmapMemory(device.getVkDevice(), stagingBuffer.getVkDeviceMemory());
+
+	// create vertex buffer
+	vertexBuffer = new VulkanBuffer(physicalDevice, device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	// copy buffer content
+	stagingBuffer.copyTo(*vertexBuffer, bufferSize);
 }
 
 VulkanVertexBuffer::~VulkanVertexBuffer() {
-	vkDestroyBuffer(device.getVkDevice(), vertexBuffer, nullptr);
-	vkFreeMemory(device.getVkDevice(), deviceMemory, nullptr);
-}
-
-uint32_t VulkanVertexBuffer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-	VkPhysicalDeviceMemoryProperties memoryProperties;
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice.getVkPhysicalDevice(), &memoryProperties);
-
-	for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
-		if (typeFilter & (1 << i)) {
-			if (memoryProperties.memoryTypes[i].propertyFlags & properties) {
-				return i;
-			}
-		}
-	}
-
-	throw std::runtime_error("failed to find suitable memory type");
+	delete vertexBuffer;
 }

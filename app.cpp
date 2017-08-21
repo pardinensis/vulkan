@@ -55,8 +55,7 @@ void App::init(const std::string& app_name) {
     vulkanVertexBuffer = new VulkanVertexBuffer(*vulkanPhysicalDevice, *vulkanDevice, vertexData);
 
     // create command buffers
-    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
-        *vulkanFramebuffers, vulkanPhysicalDevice->getGraphicsFamily(), *vulkanVertexBuffer);
+    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline, *vulkanFramebuffers, *vulkanVertexBuffer);
 
     // create semaphores
     vulkanSemaphoreImageAquired = new VulkanSemaphore(*vulkanDevice);
@@ -119,8 +118,7 @@ void App::recreateSwapchain() {
     vulkanRenderPass = new VulkanRenderPass(*vulkanDevice, vulkanSwapchain->getVkFormat());
     vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader);
     vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
-    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
-        *vulkanFramebuffers, vulkanPhysicalDevice->getGraphicsFamily(), *vulkanVertexBuffer);
+    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline, *vulkanFramebuffers, *vulkanVertexBuffer);
 }
 
 void App::onWindowResized(GLFWwindow* window, int width, int height) {

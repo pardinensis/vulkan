@@ -41,8 +41,17 @@ VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice) {
 
 	vkGetDeviceQueue(device, physicalDevice.getGraphicsFamily(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, physicalDevice.getPresentFamily(), 0, &presentQueue);
+
+	VkCommandPoolCreateInfo commandPoolCreateInfo = {};
+	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	commandPoolCreateInfo.queueFamilyIndex = physicalDevice.getGraphicsFamily();
+	commandPoolCreateInfo.flags = 0;
+	if (vkCreateCommandPool(device, &commandPoolCreateInfo, nullptr, &commandPool) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create command pool");
+	}
 }
 
 VulkanDevice::~VulkanDevice() {
+	vkDestroyCommandPool(device, commandPool, nullptr);
 	vkDestroyDevice(device, nullptr);
 }

@@ -8,6 +8,7 @@ private:
 	VkDevice device;
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
+	VkCommandPool commandPool;
 
 public:
 	VulkanDevice(VulkanPhysicalDevice& physicalDevice);
@@ -16,4 +17,5 @@ public:
 	const VkDevice& getVkDevice() const { return device; }
 	const VkQueue& getVkGraphicsQueue() const { return graphicsQueue; }
 	const VkQueue& getVkPresentQueue() const { return presentQueue; }
+	const VkCommandPool& getVkCommandPool() const { return commandPool; }
 };

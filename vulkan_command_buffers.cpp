@@ -2,25 +2,16 @@
 
 
 VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const VulkanRenderPass& renderPass,
-		const VulkanPipeline& pipeline, const VulkanFramebuffers& framebuffers, int graphicsFamily, const VulkanVertexBuffer& vertexBuffer)
+		const VulkanPipeline& pipeline, const VulkanFramebuffers& framebuffers, const VulkanVertexBuffer& vertexBuffer)
 		: device(device) {
 	const VkDevice& vkDevice = device.getVkDevice();
-
-	// create command pool
-	VkCommandPoolCreateInfo commandPoolCreateInfo = {};
-	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	commandPoolCreateInfo.queueFamilyIndex = graphicsFamily;
-	commandPoolCreateInfo.flags = 0;
-	if (vkCreateCommandPool(vkDevice, &commandPoolCreateInfo, nullptr, &commandPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create command pool");
-	}
 
 	// create command buffers
 	commandBuffers.resize(framebuffers.getFramebufferCount());
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = commandPool;
+	commandBufferAllocateInfo.commandPool = device.getVkCommandPool();
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	commandBufferAllocateInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 	if (vkAllocateCommandBuffers(vkDevice, &commandBufferAllocateInfo, commandBuffers.data()) != VK_SUCCESS) {
@@ -49,7 +40,7 @@ VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const Vul
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getVkPipeline());
 
-		VkBuffer vertexBuffers[] = { vertexBuffer.getVkBuffer() };
+		VkBuffer vertexBuffers[] = { vertexBuffer.getBuffer().getVkBuffer() };
 		VkDeviceSize vertexOffsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, vertexOffsets);
 		vkCmdDraw(commandBuffers[i], vertexBuffer.getVertexCount(), 1, 0, 0);
@@ -83,5 +74,5 @@ void VulkanCommandBuffers::submit(uint32_t imageIndex, const VulkanSemaphore& im
 }
 
 VulkanCommandBuffers::~VulkanCommandBuffers() {
-	vkDestroyCommandPool(device.getVkDevice(), commandPool, nullptr);
+	vkFreeCommandBuffers(device.getVkDevice(), device.getVkCommandPool(), commandBuffers.size(), commandBuffers.data());
 }
