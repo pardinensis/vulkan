@@ -4,6 +4,7 @@
 #include "vulkan_command_buffers.hpp"
 #include "vulkan_device.hpp"
 #include "vulkan_framebuffers.hpp"
+#include "vulkan_index_buffer.hpp"
 #include "vulkan_instance.hpp"
 #include "vulkan_physical_device.hpp"
 #include "vulkan_pipeline.hpp"
@@ -28,6 +29,7 @@ private:
     VulkanPipeline* vulkanPipeline;
     VulkanFramebuffers* vulkanFramebuffers;
     VulkanVertexBuffer* vulkanVertexBuffer;
+    VulkanIndexBuffer* vulkanIndexBuffer;
     VulkanCommandBuffers* vulkanCommandBuffers;
     VulkanSemaphore* vulkanSemaphoreImageAquired;
     VulkanSemaphore* vulkanSemaphoreRenderFinished;

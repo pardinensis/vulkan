@@ -1,8 +1,8 @@
 #include "vulkan_command_buffers.hpp"
 
 
-VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const VulkanRenderPass& renderPass,
-		const VulkanPipeline& pipeline, const VulkanFramebuffers& framebuffers, const VulkanVertexBuffer& vertexBuffer)
+VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const VulkanRenderPass& renderPass, const VulkanPipeline& pipeline,
+		const VulkanFramebuffers& framebuffers, const VulkanVertexBuffer& vertexBuffer, const VulkanIndexBuffer& indexBuffer)
 		: device(device) {
 	const VkDevice& vkDevice = device.getVkDevice();
 
@@ -43,7 +43,8 @@ VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const Vul
 		VkBuffer vertexBuffers[] = { vertexBuffer.getBuffer().getVkBuffer() };
 		VkDeviceSize vertexOffsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, vertexOffsets);
-		vkCmdDraw(commandBuffers[i], vertexBuffer.getVertexCount(), 1, 0, 0);
+		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer.getBuffer().getVkBuffer(), 0, VK_INDEX_TYPE_UINT16);
+		vkCmdDrawIndexed(commandBuffers[i], indexBuffer.getIndexCount(), 1, 0, 0, 0);
 		
 		vkCmdEndRenderPass(commandBuffers[i]);
 
