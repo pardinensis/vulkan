@@ -37,8 +37,8 @@ void App::init(const std::string& app_name) {
 
     // create shader
     vulkanShader = new VulkanShader(*vulkanDevice);
-    vulkanShader->addShaderModule("shader/vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-    vulkanShader->addShaderModule("shader/frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+    vulkanShader->addShaderModule("../shader/vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+    vulkanShader->addShaderModule("../shader/frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
     // create uniform buffer
     vulkanUniformBuffer = new VulkanUniformBuffer(*vulkanPhysicalDevice, *vulkanDevice);
@@ -54,6 +54,10 @@ void App::init(const std::string& app_name) {
 
     // create vertex buffer
     std::vector<VulkanVertex> vertexData = {
+        {{-0.5f, -0.5f, 0.2f}, {1.0f, 1.0f, 1.0f}},
+        {{ 0.5f, -0.5f, 0.2f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f,  0.5f, 0.2f}, {0.0f, 1.0f, 0.0f}},
+        {{ 0.5f,  0.5f, 0.2f}, {1.0f, 0.0f, 0.0f}},
         {{-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
         {{ 0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
         {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
@@ -61,7 +65,9 @@ void App::init(const std::string& app_name) {
     };
     std::vector<uint16_t> indexData = {
         0, 1, 2,
-        2, 1, 3        
+        2, 1, 3,
+        4, 5, 6,
+        6, 5, 7
     };
 
     vulkanVertexBuffer = new VulkanVertexBuffer(*vulkanPhysicalDevice, *vulkanDevice, vertexData);
