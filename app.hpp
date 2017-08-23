@@ -2,6 +2,7 @@
 
 #include "common_includes.hpp"
 #include "vulkan_command_buffers.hpp"
+#include "vulkan_descriptor_set.hpp"
 #include "vulkan_device.hpp"
 #include "vulkan_framebuffers.hpp"
 #include "vulkan_index_buffer.hpp"
@@ -12,6 +13,7 @@
 #include "vulkan_semaphore.hpp"
 #include "vulkan_shader.hpp"
 #include "vulkan_swapchain.hpp"
+#include "vulkan_uniform_buffer.hpp"
 #include "vulkan_vertex.hpp"
 #include "vulkan_vertex_buffer.hpp"
 
@@ -30,6 +32,8 @@ private:
     VulkanFramebuffers* vulkanFramebuffers;
     VulkanVertexBuffer* vulkanVertexBuffer;
     VulkanIndexBuffer* vulkanIndexBuffer;
+    VulkanUniformBuffer* vulkanUniformBuffer;
+    VulkanDescriptorSet* vulkanDescriptorSet;
     VulkanCommandBuffers* vulkanCommandBuffers;
     VulkanSemaphore* vulkanSemaphoreImageAquired;
     VulkanSemaphore* vulkanSemaphoreRenderFinished;

@@ -2,7 +2,8 @@
 
 #include "vulkan_vertex.hpp"
 
-VulkanPipeline::VulkanPipeline(const VulkanDevice& device, const VulkanRenderPass& renderPass, const VkExtent2D& vkExtent, const VulkanShader& shader) 
+VulkanPipeline::VulkanPipeline(const VulkanDevice& device, const VulkanRenderPass& renderPass, const VkExtent2D& vkExtent,
+	const VulkanShader& shader, const VulkanDescriptorSet& descriptorSet) 
 		: device(device) {
 
 	// setup vertex input format
@@ -20,6 +21,7 @@ VulkanPipeline::VulkanPipeline(const VulkanDevice& device, const VulkanRenderPas
 	inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
+
 
 	// setup viewport
 	VkViewport viewport = {};
@@ -87,8 +89,8 @@ VulkanPipeline::VulkanPipeline(const VulkanDevice& device, const VulkanRenderPas
 	// create pipeline layout
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
 	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutCreateInfo.setLayoutCount = 0;
-	pipelineLayoutCreateInfo.pSetLayouts = nullptr;
+	pipelineLayoutCreateInfo.setLayoutCount = 1;
+	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSet.getVkDescriptorSetLayout();
 	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	if (vkCreatePipelineLayout(device.getVkDevice(), &pipelineLayoutCreateInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {

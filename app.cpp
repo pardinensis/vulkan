@@ -40,8 +40,14 @@ void App::init(const std::string& app_name) {
     vulkanShader->addShaderModule("shader/vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
     vulkanShader->addShaderModule("shader/frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
+    // create uniform buffer
+    vulkanUniformBuffer = new VulkanUniformBuffer(*vulkanPhysicalDevice, *vulkanDevice);
+
+    // create descriptor set
+    vulkanDescriptorSet = new VulkanDescriptorSet(*vulkanDevice, *vulkanUniformBuffer);
+
     // create pipeline
-    vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader);
+    vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader, *vulkanDescriptorSet);
 
     // create framebuffers
     vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
@@ -54,15 +60,16 @@ void App::init(const std::string& app_name) {
         {{ 0.5f,  0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}}
     };
     std::vector<uint16_t> indexData = {
-        0, 2, 1,
-        2, 3, 1        
+        0, 1, 2,
+        2, 1, 3        
     };
 
     vulkanVertexBuffer = new VulkanVertexBuffer(*vulkanPhysicalDevice, *vulkanDevice, vertexData);
     vulkanIndexBuffer = new VulkanIndexBuffer(*vulkanPhysicalDevice, *vulkanDevice, indexData);
 
     // create command buffers
-    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline, *vulkanFramebuffers, *vulkanVertexBuffer, *vulkanIndexBuffer);
+    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
+        *vulkanFramebuffers, *vulkanVertexBuffer, *vulkanIndexBuffer, *vulkanDescriptorSet);
 
     // create semaphores
     vulkanSemaphoreImageAquired = new VulkanSemaphore(*vulkanDevice);
@@ -72,6 +79,8 @@ void App::init(const std::string& app_name) {
 void App::run() {
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
+
+        vulkanUniformBuffer->update(vulkanSwapchain->getVkExtent());
 
         vkQueueWaitIdle(vulkanDevice->getVkPresentQueue());
         
@@ -102,6 +111,9 @@ void App::cleanup() {
     delete vulkanShader;
     delete vulkanRenderPass;
     delete vulkanSwapchain;
+    
+    delete vulkanDescriptorSet;
+    delete vulkanUniformBuffer;
     delete vulkanIndexBuffer;
     delete vulkanVertexBuffer;
     delete vulkanDevice;
@@ -124,9 +136,10 @@ void App::recreateSwapchain() {
 
     vulkanSwapchain = new VulkanSwapchain(*vulkanPhysicalDevice, *vulkanDevice, surface, actualExtent);
     vulkanRenderPass = new VulkanRenderPass(*vulkanDevice, vulkanSwapchain->getVkFormat());
-    vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader);
+    vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader, *vulkanDescriptorSet);
     vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
-    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline, *vulkanFramebuffers, *vulkanVertexBuffer, *vulkanIndexBuffer);
+    vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
+        *vulkanFramebuffers, *vulkanVertexBuffer, *vulkanIndexBuffer, *vulkanDescriptorSet);
 }
 
 void App::onWindowResized(GLFWwindow* window, int width, int height) {

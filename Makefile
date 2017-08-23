@@ -1,6 +1,6 @@
 VULKAN_SDK_PATH = ../VulkanSDK/1.0.57.0/x86_64
 
-CFLAGS = -std=c++14 -I$(VULKAN_SDK_PATH)/include
+CFLAGS = -std=c++14 -I$(VULKAN_SDK_PATH)/include -ggdb
 LDFLAGS = -L$(VULKAN_SDK_PATH)/lib `pkg-config --static --libs glfw3` -lvulkan
 SOURCES = $(wildcard *.cpp)
 EXECUTABLE = Vulkan
