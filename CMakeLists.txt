@@ -16,8 +16,24 @@ set(SHADER_DIR "${CMAKE_SOURCE_DIR}/shader")
 file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag")
 file(GLOB SOURCES *.cpp )
 
+
 include_directories(${GLFW_INCLUDE_DIRS})
-
 add_executable(${NAME} ${SOURCES} ${SHADERS})
-
 target_link_libraries(${NAME} glfw ${Vulkan_LIBRARY} ${XCB_LIBRARY})
+
+
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/shader")
+set(COMPILED_SHADERS)
+foreach(_file ${SHADERS})
+	file (RELATIVE_PATH _file_rel "${CMAKE_SOURCE_DIR}" "${_file}")
+	string(REPLACE "." "_" _spv ${_file_rel})
+	set(_spv "${CMAKE_BINARY_DIR}/${_spv}.spv")
+	add_custom_command(
+		OUTPUT ${_spv}
+		COMMAND ${CMAKE_SOURCE_DIR}/tools/glslangValidator -V ${_file} -o ${_spv}
+		DEPENDS ${_file}
+	)
+	list (APPEND COMPILED_SHADERS "${_spv}")
+endforeach(_file)
+add_custom_target(SHADER_TARGET DEPENDS ${COMPILED_SHADERS})
+add_dependencies(${NAME} SHADER_TARGET)

@@ -37,8 +37,8 @@ void App::init(const std::string& app_name) {
 
     // create shader
     vulkanShader = new VulkanShader(*vulkanDevice);
-    vulkanShader->addShaderModule("../shader/vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-    vulkanShader->addShaderModule("../shader/frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+    vulkanShader->addShaderModule("shader/triangle_vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+    vulkanShader->addShaderModule("shader/triangle_frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
     // create uniform buffer
     vulkanUniformBuffer = new VulkanUniformBuffer(*vulkanPhysicalDevice, *vulkanDevice);
