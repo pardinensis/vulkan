@@ -5,6 +5,8 @@
 
 class VulkanDevice {
 private:
+	const VulkanPhysicalDevice& physicalDevice;
+
 	VkDevice device;
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
@@ -15,6 +17,8 @@ private:
 public:
 	VulkanDevice(VulkanPhysicalDevice& physicalDevice);
 	~VulkanDevice();
+
+	const VulkanPhysicalDevice& getPhysicalDevice() const { return physicalDevice; }
 
 	const VkDevice& getVkDevice() const { return device; }
 	const VkQueue& getVkGraphicsQueue() const { return graphicsQueue; }

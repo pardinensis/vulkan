@@ -3,7 +3,6 @@
 #include "common_includes.hpp"
 #include "vulkan_buffer.hpp"
 #include "vulkan_device.hpp"
-#include "vulkan_physical_device.hpp"
 
 struct VulkanUniformBufferObject {
 	glm::mat4 model;
@@ -13,13 +12,12 @@ struct VulkanUniformBufferObject {
 
 class VulkanUniformBuffer {
 private:
-	const VulkanPhysicalDevice& physicalDevice;
 	const VulkanDevice& device;
 
 	VulkanBuffer* uniformBuffer;
 
 public:
-	VulkanUniformBuffer(const VulkanPhysicalDevice& physicalDevice, const VulkanDevice& device);
+	VulkanUniformBuffer(const VulkanDevice& device);
 	~VulkanUniformBuffer();
 
 	const VulkanBuffer& getBuffer() const { return *uniformBuffer; }

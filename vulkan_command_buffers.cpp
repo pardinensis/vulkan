@@ -26,7 +26,7 @@ VulkanCommandBuffers::VulkanCommandBuffers(const VulkanDevice& device, const Vul
 		commandBufferBeginInfo.pInheritanceInfo = nullptr;
 		vkBeginCommandBuffer(commandBuffers[i], &commandBufferBeginInfo);
 
-		VkClearValue clearValue = { 0.0f, 0.0f, 0.0f, 0.0f };
+		VkClearValue clearValue = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 		VkRenderPassBeginInfo renderPassBeginInfo = {};
 		renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

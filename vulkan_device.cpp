@@ -3,7 +3,8 @@
 #include "config.hpp"
 #include "vulkan_validation_layers.hpp"
 
-VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice) {
+VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice) 
+		: physicalDevice(physicalDevice) {
 	// gather queue info
 	std::vector<VkDeviceQueueCreateInfo> queueInfos;
 	std::set<int> uniqueQueueFamilies = { physicalDevice.getGraphicsFamily(), physicalDevice.getPresentFamily() };
@@ -17,8 +18,9 @@ VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice) {
 		queueInfos.push_back(deviceQueueCreateInfo);
 	}
 
-	// get device features (none)
+	// get device features
 	VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
+	physicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	// get enabled layers
 	std::vector<const char*> enabledLayers;
@@ -50,14 +52,16 @@ VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice) {
 		throw std::runtime_error("failed to create command pool");
 	}
 
-	VkDescriptorPoolSize descriptorPoolSize = {};
-	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorPoolSize.descriptorCount = 1;
+	std::array<VkDescriptorPoolSize, 2> descriptorPoolSizes = {};
+	descriptorPoolSizes[0].descriptorCount = 1;
+	descriptorPoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorPoolSizes[1].descriptorCount = 1;
+	descriptorPoolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 
 	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	descriptorPoolCreateInfo.poolSizeCount = 1;
-	descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
+	descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(descriptorPoolSizes.size());
+	descriptorPoolCreateInfo.pPoolSizes = descriptorPoolSizes.data();
 	descriptorPoolCreateInfo.maxSets = 1;
 	if (vkCreateDescriptorPool(device, &descriptorPoolCreateInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool");

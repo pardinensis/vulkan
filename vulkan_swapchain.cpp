@@ -58,33 +58,16 @@ VulkanSwapchain::VulkanSwapchain(const VulkanPhysicalDevice& vulkanPhysicalDevic
 	swapchainExtent = extent;
 
 	// create image views
-	swapchainImageViews.resize(swapchainImages.size());
 	for (size_t i = 0; i < swapchainImages.size(); ++i) {
-		VkImageViewCreateInfo imageViewCreateInfo = {};
-		imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		imageViewCreateInfo.image = swapchainImages[i];
-		imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		imageViewCreateInfo.format = swapchainImageFormat;
-		imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-		imageViewCreateInfo.subresourceRange.levelCount = 1;
-		imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-		imageViewCreateInfo.subresourceRange.layerCount = 1;
-
-		if (vkCreateImageView(vulkanDevice.getVkDevice(), &imageViewCreateInfo, nullptr, &swapchainImageViews[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create image views");
-		}
+		swapchainImageViews.push_back(new VulkanImageView(vulkanDevice, swapchainImages[i], swapchainImageFormat));
 	}
 }
 
 VulkanSwapchain::~VulkanSwapchain() {
 	for (size_t i = 0; i < swapchainImageViews.size(); ++i) {
-		vkDestroyImageView(vulkanDevice.getVkDevice(), swapchainImageViews[i], nullptr);
-	}
+		delete swapchainImageViews[i];
+	};
+	swapchainImageViews.clear();
 
 	vkDestroySwapchainKHR(vulkanDevice.getVkDevice(), swapchain, nullptr);
 }

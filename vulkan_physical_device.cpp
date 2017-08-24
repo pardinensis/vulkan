@@ -71,6 +71,13 @@ bool VulkanPhysicalDevice::isSuitable() {
 		return false;
 	}
 
+	// check for anisotropic filtering
+	VkPhysicalDeviceFeatures supportedFeatures;
+	vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &supportedFeatures);
+	if (!supportedFeatures.samplerAnisotropy) {
+		return false;
+	}
+
 	return true;
 }
 

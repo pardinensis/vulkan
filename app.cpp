@@ -41,10 +41,14 @@ void App::init(const std::string& app_name) {
     vulkanShader->addShaderModule("shader/triangle_frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
     // create uniform buffer
-    vulkanUniformBuffer = new VulkanUniformBuffer(*vulkanPhysicalDevice, *vulkanDevice);
+    vulkanUniformBuffer = new VulkanUniformBuffer(*vulkanDevice);
+
+    // create texture
+    vulkanTexture = new VulkanTexture(*vulkanDevice, "../texture/og.jpg");
+    vulkanTextureSampler = new VulkanTextureSampler(*vulkanDevice);
 
     // create descriptor set
-    vulkanDescriptorSet = new VulkanDescriptorSet(*vulkanDevice, *vulkanUniformBuffer);
+    vulkanDescriptorSet = new VulkanDescriptorSet(*vulkanDevice, *vulkanUniformBuffer, vulkanTexture->getImageView(), *vulkanTextureSampler);
 
     // create pipeline
     vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader, *vulkanDescriptorSet);
@@ -54,14 +58,14 @@ void App::init(const std::string& app_name) {
 
     // create vertex buffer
     std::vector<VulkanVertex> vertexData = {
-        {{-0.5f, -0.5f, 0.2f}, {1.0f, 1.0f, 1.0f}},
-        {{ 0.5f, -0.5f, 0.2f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f,  0.5f, 0.2f}, {0.0f, 1.0f, 0.0f}},
-        {{ 0.5f,  0.5f, 0.2f}, {1.0f, 0.0f, 0.0f}},
-        {{-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-        {{ 0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-        {{ 0.5f,  0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}}
+        {{-0.5f, -0.5f, 0.2f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+        {{ 0.5f, -0.5f, 0.2f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{-0.5f,  0.5f, 0.2f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ 0.5f,  0.5f, 0.2f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+        {{-0.5f, -0.5f, 0.4f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+        {{ 0.5f, -0.5f, 0.4f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{-0.5f,  0.5f, 0.4f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ 0.5f,  0.5f, 0.4f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}
     };
     std::vector<uint16_t> indexData = {
         0, 1, 2,
@@ -70,8 +74,8 @@ void App::init(const std::string& app_name) {
         6, 5, 7
     };
 
-    vulkanVertexBuffer = new VulkanVertexBuffer(*vulkanPhysicalDevice, *vulkanDevice, vertexData);
-    vulkanIndexBuffer = new VulkanIndexBuffer(*vulkanPhysicalDevice, *vulkanDevice, indexData);
+    vulkanVertexBuffer = new VulkanVertexBuffer(*vulkanDevice, vertexData);
+    vulkanIndexBuffer = new VulkanIndexBuffer(*vulkanDevice, indexData);
 
     // create command buffers
     vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
@@ -120,6 +124,8 @@ void App::cleanup() {
     
     delete vulkanDescriptorSet;
     delete vulkanUniformBuffer;
+    delete vulkanTextureSampler;
+    delete vulkanTexture;
     delete vulkanIndexBuffer;
     delete vulkanVertexBuffer;
     delete vulkanDevice;

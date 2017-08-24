@@ -13,6 +13,8 @@
 #include "vulkan_semaphore.hpp"
 #include "vulkan_shader.hpp"
 #include "vulkan_swapchain.hpp"
+#include "vulkan_texture.hpp"
+#include "vulkan_texture_sampler.hpp"
 #include "vulkan_uniform_buffer.hpp"
 #include "vulkan_vertex.hpp"
 #include "vulkan_vertex_buffer.hpp"
@@ -32,6 +34,8 @@ private:
     VulkanFramebuffers* vulkanFramebuffers;
     VulkanVertexBuffer* vulkanVertexBuffer;
     VulkanIndexBuffer* vulkanIndexBuffer;
+    VulkanTexture* vulkanTexture;
+    VulkanTextureSampler* vulkanTextureSampler;
     VulkanUniformBuffer* vulkanUniformBuffer;
     VulkanDescriptorSet* vulkanDescriptorSet;
     VulkanCommandBuffers* vulkanCommandBuffers;

@@ -2,11 +2,11 @@
 
 VulkanFramebuffers::VulkanFramebuffers(const VulkanDevice& device, const VulkanSwapchain& swapchain, const VulkanRenderPass& renderPass)
 		: device(device), extent(swapchain.getVkExtent()) {
-	const std::vector<VkImageView>& imageViews = swapchain.getVkImageViews();
+	const std::vector<VulkanImageView*>& imageViews = swapchain.getImageViews();
 
 	framebuffers.resize(imageViews.size());
 	for (size_t i = 0; i < imageViews.size(); ++i) {
-		VkImageView attachments[] = { imageViews[i] };
+		VkImageView attachments[] = { imageViews[i]->getVkImageView() };
 
 		VkFramebufferCreateInfo framebufferCreateInfo = {};
 		framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;

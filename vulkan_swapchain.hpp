@@ -2,6 +2,7 @@
 
 #include "common_includes.hpp"
 #include "vulkan_device.hpp"
+#include "vulkan_image_view.hpp"
 #include "vulkan_physical_device.hpp"
 #include "vulkan_semaphore.hpp"
 
@@ -14,7 +15,8 @@ private:
 	std::vector<VkImage> swapchainImages;
 	VkFormat swapchainImageFormat;
 	VkExtent2D swapchainExtent;
-	std::vector<VkImageView> swapchainImageViews;
+
+	std::vector<VulkanImageView*> swapchainImageViews;
 
 
 public:
@@ -27,7 +29,7 @@ public:
 	const VkSwapchainKHR getVkSwapchain() const { return swapchain; }
 	const VkFormat& getVkFormat() const { return swapchainImageFormat; }
 	const VkExtent2D& getVkExtent() const { return swapchainExtent; }
-	const std::vector<VkImageView>& getVkImageViews() const { return swapchainImageViews; }
+	const std::vector<VulkanImageView*>& getImageViews() const { return swapchainImageViews; }
 
 private:
 	VkSurfaceFormatKHR chooseSurfaceFormat();

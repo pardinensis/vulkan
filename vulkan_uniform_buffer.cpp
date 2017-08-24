@@ -1,10 +1,10 @@
 #include "vulkan_uniform_buffer.hpp"
 
-VulkanUniformBuffer::VulkanUniformBuffer(const VulkanPhysicalDevice& physicalDevice, const VulkanDevice& device)
-		: physicalDevice(physicalDevice), device(device) {
+VulkanUniformBuffer::VulkanUniformBuffer(const VulkanDevice& device)
+		: device(device) {
 
 	VkDeviceSize bufferSize = sizeof(VulkanUniformBufferObject);
-	uniformBuffer = new VulkanBuffer(physicalDevice, device, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+	uniformBuffer = new VulkanBuffer(device, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
@@ -27,4 +27,6 @@ void VulkanUniformBuffer::update(const VkExtent2D& extent) {
 	vkMapMemory(device.getVkDevice(), uniformBuffer->getVkDeviceMemory(), 0, sizeof(uniformBufferObject), 0, &data);
     memcpy(data, &uniformBufferObject, sizeof(uniformBufferObject));
 	vkUnmapMemory(device.getVkDevice(), uniformBuffer->getVkDeviceMemory());
+
+	uniformBuffer->fill(sizeof(uniformBufferObject), &uniformBufferObject);
 }

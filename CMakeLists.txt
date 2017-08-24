@@ -6,23 +6,26 @@ set(NAME Vulkan)
 project(${NAME})
 
 
-find_package(glfw3 REQUIRED)
+find_package(glfw3 3.2 REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(XCB REQUIRED)
 
 add_definitions(-std=c++14)
 
-set(SHADER_DIR "${CMAKE_SOURCE_DIR}/shader")
-file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag")
 file(GLOB SOURCES *.cpp )
 
 
-include_directories(${GLFW_INCLUDE_DIRS})
+include_directories(${Vulkan_INCLUDE_DIRS})
+MESSAGE(STATUS ${Vulkan_INCLUDE_DIRS})
+
 add_executable(${NAME} ${SOURCES} ${SHADERS})
 target_link_libraries(${NAME} glfw ${Vulkan_LIBRARY} ${XCB_LIBRARY})
 
-
+# compile shaders
+set(SHADER_DIR "${CMAKE_SOURCE_DIR}/shader")
+file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/shader")
+
 set(COMPILED_SHADERS)
 foreach(_file ${SHADERS})
 	file (RELATIVE_PATH _file_rel "${CMAKE_SOURCE_DIR}" "${_file}")
@@ -35,5 +38,5 @@ foreach(_file ${SHADERS})
 	)
 	list (APPEND COMPILED_SHADERS "${_spv}")
 endforeach(_file)
-add_custom_target(SHADER_TARGET DEPENDS ${COMPILED_SHADERS})
-add_dependencies(${NAME} SHADER_TARGET)
+add_custom_target(shaders DEPENDS ${COMPILED_SHADERS})
+add_dependencies(${NAME} shaders)

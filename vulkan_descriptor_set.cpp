@@ -1,19 +1,32 @@
 #include "vulkan_descriptor_set.hpp"
 
-VulkanDescriptorSet::VulkanDescriptorSet(const VulkanDevice& device, const VulkanUniformBuffer& uniformBuffer) 
+VulkanDescriptorSet::VulkanDescriptorSet(const VulkanDevice& device, const VulkanUniformBuffer& uniformBuffer,
+	const VulkanImageView& imageView, const VulkanTextureSampler& sampler)
 		: device(device) {
-	// setup descriptor set layout
-	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
-	descriptorSetLayoutBinding.binding = 0;
-	descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorSetLayoutBinding.descriptorCount = 1;
-	descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	descriptorSetLayoutBinding.pImmutableSamplers = nullptr;
+	// setup descriptor set layout for uniform buffer
+	VkDescriptorSetLayoutBinding uniformBufferLayoutBinding = {};
+	uniformBufferLayoutBinding.binding = 0;
+	uniformBufferLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	uniformBufferLayoutBinding.descriptorCount = 1;
+	uniformBufferLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	uniformBufferLayoutBinding.pImmutableSamplers = nullptr;
+
+	// setup descriptor set layout for texture sampler
+	VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
+	samplerLayoutBinding.binding = 1;
+	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	samplerLayoutBinding.pImmutableSamplers = nullptr;
+
+	std::array<VkDescriptorSetLayoutBinding, 2> descriptorSetLayoutBindings = {
+		uniformBufferLayoutBinding, samplerLayoutBinding
+	};
 
 	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
 	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCreateInfo.bindingCount = 1;
-	descriptorSetLayoutCreateInfo.pBindings = &descriptorSetLayoutBinding;
+	descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayoutBindings.size());
+	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBindings.data();
 	if (vkCreateDescriptorSetLayout(device.getVkDevice(), &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout");
 	}
@@ -34,17 +47,29 @@ VulkanDescriptorSet::VulkanDescriptorSet(const VulkanDevice& device, const Vulka
 	descriptorBufferInfo.offset = 0;
 	descriptorBufferInfo.range = sizeof(VulkanUniformBufferObject);
 
-	VkWriteDescriptorSet writeDescriptorSet = {};
-	writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptorSet.dstSet = descriptorSet;
-	writeDescriptorSet.dstBinding = 0;
-	writeDescriptorSet.dstArrayElement = 0;
-	writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	writeDescriptorSet.descriptorCount = 1;
-	writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-	writeDescriptorSet.pImageInfo = nullptr;
-	writeDescriptorSet.pTexelBufferView = nullptr;
-	vkUpdateDescriptorSets(device.getVkDevice(), 1, &writeDescriptorSet, 0, nullptr);
+	std::array<VkWriteDescriptorSet, 2> writeDescriptorSets = {};
+	writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSets[0].dstSet = descriptorSet;
+	writeDescriptorSets[0].dstBinding = 0;
+	writeDescriptorSets[0].dstArrayElement = 0;
+	writeDescriptorSets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	writeDescriptorSets[0].descriptorCount = 1;
+	writeDescriptorSets[0].pBufferInfo = &descriptorBufferInfo;
+
+	VkDescriptorImageInfo descriptorImageInfo = {};
+	descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	descriptorImageInfo.imageView = imageView.getVkImageView();
+	descriptorImageInfo.sampler = sampler.getVkSampler();
+
+	writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSets[1].dstSet = descriptorSet;
+	writeDescriptorSets[1].dstBinding = 1;
+	writeDescriptorSets[1].dstArrayElement = 0;
+	writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	writeDescriptorSets[1].descriptorCount = 1;
+	writeDescriptorSets[1].pImageInfo = &descriptorImageInfo;
+
+	vkUpdateDescriptorSets(device.getVkDevice(), static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 }
 
 VulkanDescriptorSet::~VulkanDescriptorSet() {
