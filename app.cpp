@@ -53,8 +53,11 @@ void App::init(const std::string& app_name) {
     // create pipeline
     vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader, *vulkanDescriptorSet);
 
+    // create depth resource
+    vulkanDepthResource = new VulkanDepthResource(*vulkanDevice, vulkanSwapchain->getVkExtent());
+
     // create framebuffers
-    vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
+    vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass, vulkanDepthResource->getImageView());
 
     // create vertex buffer
     std::vector<VulkanVertex> vertexData = {
@@ -62,10 +65,10 @@ void App::init(const std::string& app_name) {
         {{ 0.5f, -0.5f, 0.2f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
         {{-0.5f,  0.5f, 0.2f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
         {{ 0.5f,  0.5f, 0.2f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
-        {{-0.5f, -0.5f, 0.4f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-        {{ 0.5f, -0.5f, 0.4f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-        {{-0.5f,  0.5f, 0.4f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
-        {{ 0.5f,  0.5f, 0.4f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}
+        {{-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+        {{ 0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ 0.5f,  0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}
     };
     std::vector<uint16_t> indexData = {
         0, 1, 2,
@@ -117,6 +120,7 @@ void App::cleanup() {
     delete vulkanSemaphoreImageAquired;
     delete vulkanCommandBuffers;
     delete vulkanFramebuffers;
+    delete vulkanDepthResource;
     delete vulkanPipeline;
     delete vulkanShader;
     delete vulkanRenderPass;
@@ -138,6 +142,7 @@ void App::recreateSwapchain() {
 
     delete vulkanCommandBuffers;
     delete vulkanFramebuffers;
+    delete vulkanDepthResource;
     delete vulkanPipeline;
     delete vulkanRenderPass;
     delete vulkanSwapchain;
@@ -149,7 +154,8 @@ void App::recreateSwapchain() {
     vulkanSwapchain = new VulkanSwapchain(*vulkanPhysicalDevice, *vulkanDevice, surface, actualExtent);
     vulkanRenderPass = new VulkanRenderPass(*vulkanDevice, vulkanSwapchain->getVkFormat());
     vulkanPipeline = new VulkanPipeline(*vulkanDevice, *vulkanRenderPass, vulkanSwapchain->getVkExtent(), *vulkanShader, *vulkanDescriptorSet);
-    vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass);
+    vulkanDepthResource = new VulkanDepthResource(*vulkanDevice, vulkanSwapchain->getVkExtent());
+    vulkanFramebuffers = new VulkanFramebuffers(*vulkanDevice, *vulkanSwapchain, *vulkanRenderPass, vulkanDepthResource->getImageView());
     vulkanCommandBuffers = new VulkanCommandBuffers(*vulkanDevice, *vulkanRenderPass, *vulkanPipeline,
         *vulkanFramebuffers, *vulkanVertexBuffer, *vulkanIndexBuffer, *vulkanDescriptorSet);
 }

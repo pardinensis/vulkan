@@ -59,7 +59,7 @@ VulkanSwapchain::VulkanSwapchain(const VulkanPhysicalDevice& vulkanPhysicalDevic
 
 	// create image views
 	for (size_t i = 0; i < swapchainImages.size(); ++i) {
-		swapchainImageViews.push_back(new VulkanImageView(vulkanDevice, swapchainImages[i], swapchainImageFormat));
+		swapchainImageViews.push_back(new VulkanImageView(vulkanDevice, swapchainImages[i], swapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT));
 	}
 }
 

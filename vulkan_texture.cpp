@@ -29,7 +29,7 @@ VulkanTexture::VulkanTexture(const VulkanDevice& device, const std::string& file
 	image->transitionLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// create image view
-	imageView = new VulkanImageView(device, image->getVkImage(), VK_FORMAT_R8G8B8A8_UNORM);
+	imageView = new VulkanImageView(device, image->getVkImage(), VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 VulkanTexture::~VulkanTexture() {

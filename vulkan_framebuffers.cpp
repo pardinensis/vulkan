@@ -1,18 +1,22 @@
 #include "vulkan_framebuffers.hpp"
 
-VulkanFramebuffers::VulkanFramebuffers(const VulkanDevice& device, const VulkanSwapchain& swapchain, const VulkanRenderPass& renderPass)
+VulkanFramebuffers::VulkanFramebuffers(const VulkanDevice& device, const VulkanSwapchain& swapchain,
+	const VulkanRenderPass& renderPass, const VulkanImageView& depthImageView)
 		: device(device), extent(swapchain.getVkExtent()) {
 	const std::vector<VulkanImageView*>& imageViews = swapchain.getImageViews();
 
 	framebuffers.resize(imageViews.size());
 	for (size_t i = 0; i < imageViews.size(); ++i) {
-		VkImageView attachments[] = { imageViews[i]->getVkImageView() };
+		std::array<VkImageView, 2> attachments = { 
+			imageViews[i]->getVkImageView(),
+			depthImageView.getVkImageView()
+		};
 
 		VkFramebufferCreateInfo framebufferCreateInfo = {};
 		framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferCreateInfo.renderPass = renderPass.getVkRenderPass();
-		framebufferCreateInfo.attachmentCount = 1;
-		framebufferCreateInfo.pAttachments = attachments;
+		framebufferCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+		framebufferCreateInfo.pAttachments = attachments.data();
 		framebufferCreateInfo.width = extent.width;
 		framebufferCreateInfo.height = extent.height;
 		framebufferCreateInfo.layers = 1;

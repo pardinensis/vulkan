@@ -2,6 +2,7 @@
 
 #include "common_includes.hpp"
 #include "vulkan_command_buffers.hpp"
+#include "vulkan_depth_resource.hpp"
 #include "vulkan_descriptor_set.hpp"
 #include "vulkan_device.hpp"
 #include "vulkan_framebuffers.hpp"
@@ -31,6 +32,7 @@ private:
     VulkanRenderPass* vulkanRenderPass;
     VulkanShader* vulkanShader;
     VulkanPipeline* vulkanPipeline;
+    VulkanDepthResource* vulkanDepthResource;
     VulkanFramebuffers* vulkanFramebuffers;
     VulkanVertexBuffer* vulkanVertexBuffer;
     VulkanIndexBuffer* vulkanIndexBuffer;

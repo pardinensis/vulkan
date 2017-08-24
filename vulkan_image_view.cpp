@@ -1,6 +1,6 @@
 #include "vulkan_image_view.hpp"
 
-VulkanImageView::VulkanImageView(const VulkanDevice& device, const VkImage& image, const VkFormat& format) 
+VulkanImageView::VulkanImageView(const VulkanDevice& device, const VkImage& image, const VkFormat& format, const VkImageAspectFlags& aspect) 
 		: device(device) {
 
 	VkImageViewCreateInfo imageViewCreateInfo = {};
@@ -12,7 +12,7 @@ VulkanImageView::VulkanImageView(const VulkanDevice& device, const VkImage& imag
 	imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 	imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
 	imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-	imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	imageViewCreateInfo.subresourceRange.aspectMask = aspect;
 	imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
 	imageViewCreateInfo.subresourceRange.levelCount = 1;
 	imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;

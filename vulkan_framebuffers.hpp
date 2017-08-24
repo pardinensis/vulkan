@@ -12,7 +12,8 @@ private:
 	std::vector<VkFramebuffer> framebuffers;
 
 public:
-	VulkanFramebuffers(const VulkanDevice& device, const VulkanSwapchain& swapchain, const VulkanRenderPass& renderPass);
+	VulkanFramebuffers(const VulkanDevice& device, const VulkanSwapchain& swapchain,
+		const VulkanRenderPass& renderPass, const VulkanImageView& depthImageView);
 	~VulkanFramebuffers();
 
 	int getFramebufferCount() const { return framebuffers.size(); }

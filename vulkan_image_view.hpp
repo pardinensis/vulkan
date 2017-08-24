@@ -11,7 +11,7 @@ private:
 	VkImageView imageView;
 
 public:
-	VulkanImageView(const VulkanDevice& device, const VkImage& image, const VkFormat& format);
+	VulkanImageView(const VulkanDevice& device, const VkImage& image, const VkFormat& format, const VkImageAspectFlags& aspect);
 	~VulkanImageView();
 
 	const VkImageView& getVkImageView() const { return imageView; }
