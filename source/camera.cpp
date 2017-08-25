@@ -3,7 +3,8 @@
 #include "config.hpp"
 
 Camera::Camera(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up)
-		: pos(pos), dir(glm::normalize(dir)), up(up), slowSpeed(CAMERA_SPEED_SLOW), fastSpeed(CAMERA_SPEED_FAST), rotSpeed(CAMERA_SPEED_ROTATION) {
+		: pos(pos), dir(glm::normalize(dir)), up(up),
+		  slowSpeed(CAMERA_SPEED_LINEAR), fastSpeed(CAMERA_SPEED_LINEAR * CAMERA_SPEED_FAST_FACTOR), rotSpeed(CAMERA_SPEED_ANGULAR) {
 
 	// assume no keys are pressed
 	keyForward = false;
@@ -17,6 +18,9 @@ Camera::Camera(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up)
 	// TODO
 	pitch = 0;
 }
+
+Camera::Camera()
+		: Camera(CAMERA_INITIAL_POS, CAMERA_INITIAL_DIR, CAMERA_INITIAL_UP) {}
 
 void Camera::keyPressed(int keycode) {
 	switch (keycode) {

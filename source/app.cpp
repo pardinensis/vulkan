@@ -43,7 +43,7 @@ void App::init(const std::string& app_name) {
 	shader->addShaderModule("shader/triangle_frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 	// create camera
-	camera = new Camera(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(-10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	camera = new Camera();
 
 	// create uniform buffer
 	uniformBuffer = new UniformBuffer(*device);
@@ -66,7 +66,7 @@ void App::init(const std::string& app_name) {
 
 	// vertexBuffer = new VertexBuffer(*device, vertexData);
 	// indexBuffer = new IndexBuffer(*device, indexData);
-	model = ModelLoader::loadObjFile(*device, "../models/balloon.obj");
+	model = ModelLoader::loadObjFile(*device, "../models/bunny2503.obj");
 
 	// create command buffers
 	commandBuffers = new CommandBuffers(*device, *renderPass, *pipeline,

@@ -31,6 +31,7 @@ private:
 
 public:
 	Camera(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up);
+	Camera();
 
 	void keyPressed(int keycode);
 	void keyReleased(int keycode);
