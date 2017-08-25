@@ -6,23 +6,24 @@ set(NAME Vulkan)
 project(${NAME})
 
 
+set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/source")
+set(SHADER_DIR "${CMAKE_SOURCE_DIR}/shader")
+set(CONTRIB_DIR "${CMAKE_SOURCE_DIR}/contrib")
+
 find_package(glfw3 3.2 REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(XCB REQUIRED)
 
 add_definitions(-std=c++14)
 
-file(GLOB SOURCES *.cpp )
-
-
 include_directories(${Vulkan_INCLUDE_DIRS})
-MESSAGE(STATUS ${Vulkan_INCLUDE_DIRS})
+include_directories(${CONTRIB_DIR})
 
+file(GLOB SOURCES ${SOURCE_DIR}/*.cpp )
 add_executable(${NAME} ${SOURCES} ${SHADERS})
 target_link_libraries(${NAME} glfw ${Vulkan_LIBRARY} ${XCB_LIBRARY})
 
 # compile shaders
-set(SHADER_DIR "${CMAKE_SOURCE_DIR}/shader")
 file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/shader")
 
