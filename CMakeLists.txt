@@ -13,6 +13,7 @@ set(CONTRIB_DIR "${CMAKE_SOURCE_DIR}/contrib")
 find_package(glfw3 3.2 REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(XCB REQUIRED)
+find_package(assimp REQUIRED)
 
 add_definitions(-std=c++14)
 

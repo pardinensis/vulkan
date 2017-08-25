@@ -23,5 +23,5 @@ public:
 
 	const Buffer& getBuffer() const { return *uniformBuffer; }
 
-	void update(const VkExtent2D& extent);
+	void update(const VkExtent2D& extent, const glm::mat4& viewMatrix);
 };

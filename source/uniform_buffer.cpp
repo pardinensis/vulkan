@@ -12,15 +12,16 @@ UniformBuffer::~UniformBuffer() {
 	delete uniformBuffer;
 }
 
-void UniformBuffer::update(const VkExtent2D& extent) {
-	static auto startTime = std::chrono::high_resolution_clock::now();
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
+void UniformBuffer::update(const VkExtent2D& extent, const glm::mat4& viewMatrix) {
+	// static auto startTime = std::chrono::high_resolution_clock::now();
+	// auto currentTime = std::chrono::high_resolution_clock::now();
+	// float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
+	float time = 0;
 
 	UniformBufferObject uniformBufferObject = {};
-	uniformBufferObject.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	uniformBufferObject.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	uniformBufferObject.proj = glm::perspective(glm::radians(45.0f), extent.width / (float) extent.height, 0.1f, 10.0f);
+	uniformBufferObject.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	uniformBufferObject.view = viewMatrix;
+	uniformBufferObject.proj = glm::perspective(glm::radians(60.0f), extent.width / (float) extent.height, 0.1f, 100.0f);
 	uniformBufferObject.proj[1][1] *= -1; // compensate for the inverse y coordinate axis (vulkan: y up, opengl: y down)
 
 	void* data;
