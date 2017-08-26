@@ -21,7 +21,7 @@ void UniformBuffer::update(const VkExtent2D& extent, const glm::mat4& viewMatrix
 	UniformBufferObject uniformBufferObject = {};
 	uniformBufferObject.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	uniformBufferObject.view = viewMatrix;
-	uniformBufferObject.proj = glm::perspective(glm::radians(60.0f), extent.width / (float) extent.height, 0.1f, 100.0f);
+	uniformBufferObject.proj = glm::perspective(glm::radians(60.0f), extent.width / (float) extent.height, 0.01f, 10.0f);
 	uniformBufferObject.proj[1][1] *= -1; // compensate for the inverse y coordinate axis (vulkan: y up, opengl: y down)
 
 	void* data;

@@ -7,8 +7,14 @@ void App::init(const std::string& app_name) {
 	glfwInit();
 
 	// create window
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
+	window = glfwCreateWindow(mode->width, mode->height, WINDOW_NAME, monitor, nullptr);
 
 	glfwSetWindowUserPointer(window, this);
 	glfwSetWindowSizeCallback(window, App::onWindowResized);
@@ -64,9 +70,8 @@ void App::init(const std::string& app_name) {
 	// create framebuffers
 	framebuffers = new Framebuffers(*device, *swapchain, *renderPass, depthResource->getImageView());
 
-	// vertexBuffer = new VertexBuffer(*device, vertexData);
-	// indexBuffer = new IndexBuffer(*device, indexData);
-	model = ModelLoader::loadObjFile(*device, "../models/bunny2503.obj");
+	model = ModelLoader::loadObjFile(*device, "../models/bunny2503.obj", false);
+	// model = ModelLoader::loadObjFile(*device, "../models/bunny34817.obj", false);
 
 	// create command buffers
 	commandBuffers = new CommandBuffers(*device, *renderPass, *pipeline,
@@ -168,6 +173,10 @@ void App::onKeyAction(GLFWwindow* window, int key, int scancode, int action, int
 		case GLFW_RELEASE:
 			app->camera->keyReleased(key);
 			break;
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 }
 
