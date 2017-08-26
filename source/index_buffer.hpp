@@ -9,12 +9,12 @@ class IndexBuffer {
 private:
 	const Device& device;
 
-	std::vector<uint16_t> indexData;
+	std::vector<uint32_t> indexData;
 
 	Buffer* indexBuffer;
 
 public:
-	IndexBuffer(const Device& device, const std::vector<uint16_t> indexData);
+	IndexBuffer(const Device& device, const std::vector<uint32_t> indexData);
 	~IndexBuffer();
 
 	unsigned int getIndexCount() const { return indexData.size(); }

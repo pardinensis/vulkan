@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 
-void ModelLoader::generateNormals(std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices) {
+void ModelLoader::generateNormals(std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) {
 	for (Vertex& v : vertices) {
 		v.normal = glm::vec3(0, 0, 0);
 	}
@@ -39,9 +39,9 @@ Model* ModelLoader::loadObjFile(const Device &device, const std::string &filenam
 	const bool hasNormals = !attrib.normals.empty();
 	const bool hasTexcoords = !attrib.texcoords.empty();
 
-	std::unordered_map<Vertex, uint16_t> uniqueVertices;
+	std::unordered_map<Vertex, uint32_t> uniqueVertices;
 	std::vector<Vertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint32_t> indices;
 
 	for (const tinyobj::shape_t& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {

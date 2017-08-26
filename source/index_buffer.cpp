@@ -1,6 +1,6 @@
 #include "index_buffer.hpp"
 
-IndexBuffer::IndexBuffer(const Device& device, const std::vector<uint16_t> indexData)
+IndexBuffer::IndexBuffer(const Device& device, const std::vector<uint32_t> indexData)
 		: device(device), indexData(indexData) {
 
 	// create staging buffer

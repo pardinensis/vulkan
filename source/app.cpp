@@ -71,7 +71,7 @@ void App::init(const std::string& app_name) {
 	framebuffers = new Framebuffers(*device, *swapchain, *renderPass, depthResource->getImageView());
 
 	model = ModelLoader::loadObjFile(*device, "../models/bunny2503.obj", false);
-	// model = ModelLoader::loadObjFile(*device, "../models/bunny34817.obj", false);
+	// model = ModelLoader::loadObjFile(*device, "../models/bunny34817.obj", true);
 
 	// create command buffers
 	commandBuffers = new CommandBuffers(*device, *renderPass, *pipeline,

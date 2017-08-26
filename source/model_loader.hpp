@@ -5,7 +5,7 @@
 
 class ModelLoader {
 private:
-	static void generateNormals(std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
+	static void generateNormals(std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 
 public:
 	static Model* loadObjFile(const Device& device, const std::string& filename, const bool smoothShading);
