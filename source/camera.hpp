@@ -33,11 +33,11 @@ public:
 	Camera(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up);
 	Camera();
 
-	void keyPressed(int keycode);
-	void keyReleased(int keycode);
-	void mouseButtonPressed(int button, int x, int y);
-	void mouseButtonReleased(int button);
-	void mouseMoved(int x, int y);
+	bool keyPressed(int keyCode);
+	bool keyReleased(int keyCode);
+	bool mousePressed(int button, int x, int y);
+	bool mouseReleased(int button);
+	bool mouseMoved(int x, int y);
 
 	void update();
 

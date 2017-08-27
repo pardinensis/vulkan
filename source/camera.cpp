@@ -3,8 +3,8 @@
 #include "config.hpp"
 
 Camera::Camera(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up)
-		: pos(pos), dir(glm::normalize(dir)), up(up),
-		  slowSpeed(CAMERA_SPEED_LINEAR), fastSpeed(CAMERA_SPEED_LINEAR * CAMERA_SPEED_FAST_FACTOR), rotSpeed(CAMERA_SPEED_ANGULAR) {
+		: pos(pos), dir(glm::normalize(dir)), up(up), slowSpeed(Config::CAMERA_SPEED_LINEAR),
+		  fastSpeed(Config::CAMERA_SPEED_LINEAR * Config::CAMERA_SPEED_FAST_FACTOR),rotSpeed(Config::CAMERA_SPEED_ANGULAR) {
 
 	// assume no keys are pressed
 	keyForward = false;
@@ -20,47 +20,51 @@ Camera::Camera(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up)
 }
 
 Camera::Camera()
-		: Camera(CAMERA_INITIAL_POS, CAMERA_INITIAL_DIR, CAMERA_INITIAL_UP) {}
+		: Camera(Config::CAMERA_INITIAL_POS, Config::CAMERA_INITIAL_DIR, Config::CAMERA_INITIAL_UP) {}
 
-void Camera::keyPressed(int keycode) {
-	switch (keycode) {
-		case GLFW_KEY_W: keyForward = true; break;
-		case GLFW_KEY_A: keyLeft = true; break;
-		case GLFW_KEY_S: keyBackward = true; break;
-		case GLFW_KEY_D: keyRight = true; break;
-		case GLFW_KEY_LEFT_CONTROL: keyFast = true; break;
-		default: return;
+bool Camera::keyPressed(int keyCode) {
+	switch (keyCode) {
+		case GLFW_KEY_W: keyForward = true; return true;
+		case GLFW_KEY_A: keyLeft = true; return true;
+		case GLFW_KEY_S: keyBackward = true; return true;
+		case GLFW_KEY_D: keyRight = true; return true;
+		case GLFW_KEY_LEFT_CONTROL: keyFast = true; return true;
+		default: return false;
 	}
 }
 
-void Camera::keyReleased(int keycode) {
-	switch (keycode) {
-		case GLFW_KEY_W: keyForward = false; break;
-		case GLFW_KEY_A: keyLeft = false; break;
-		case GLFW_KEY_S: keyBackward = false; break;
-		case GLFW_KEY_D: keyRight = false; break;
-		case GLFW_KEY_LEFT_CONTROL: keyFast = false; break;
-		default: return;
+bool Camera::keyReleased(int keyCode) {
+	switch (keyCode) {
+		case GLFW_KEY_W: keyForward = false; return true;
+		case GLFW_KEY_A: keyLeft = false; return true;
+		case GLFW_KEY_S: keyBackward = false; return true;
+		case GLFW_KEY_D: keyRight = false; return true;
+		case GLFW_KEY_LEFT_CONTROL: keyFast = false; return true;
+		default: return false;
 	}
 }
 
-void Camera::mouseButtonPressed(int button, int x, int y) {
+bool Camera::mousePressed(int button, int x, int y) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		lastMousePosX = x;
 		lastMousePosY = y;
 		buttonViewDirection = true;
+		return true;
 	}
+	return false;
 }
 
-void Camera::mouseButtonReleased(int button) {
+bool Camera::mouseReleased(int button) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		buttonViewDirection = false;
+		return true;
 	}
+	return false;
 }
 
-void Camera::mouseMoved(int x, int y) {
+bool Camera::mouseMoved(int x, int y) {
 	if (!buttonViewDirection) {
-		return;
+		return false;
 	}
 
 	int xrel = x - lastMousePosX;
@@ -82,6 +86,8 @@ void Camera::mouseMoved(int x, int y) {
 	dir = rotation * dir;
 
 	pitch = newpitch;
+
+	return true;
 }
 
 void Camera::update() {

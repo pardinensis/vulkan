@@ -14,8 +14,10 @@
 #include <array>
 #include <chrono>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <limits>
+#include <list>
 #include <set>
 #include <stdexcept>
 #include <string>

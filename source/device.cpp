@@ -24,7 +24,7 @@ Device::Device(PhysicalDevice& physicalDevice)
 
 	// get enabled layers
 	std::vector<const char*> enabledLayers;
-	if (VALIDATION_LAYERS_ENABLED)
+	if (Config::VALIDATION_LAYERS_ENABLED)
 		enabledLayers = ValidationLayers::validationLayers;
 
 	// create device

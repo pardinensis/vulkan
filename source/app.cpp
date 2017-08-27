@@ -6,39 +6,20 @@ void App::init(const std::string& app_name) {
 	// init glfw
 	glfwInit();
 
-	// create window
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	window = glfwCreateWindow(mode->width, mode->height, WINDOW_NAME, monitor, nullptr);
-
-	glfwSetWindowUserPointer(window, this);
-	glfwSetWindowSizeCallback(window, App::onWindowResized);
-	glfwSetKeyCallback(window, App::onKeyAction);
-	glfwSetMouseButtonCallback(window, App::onMouseButtonAction);
-	glfwSetCursorPosCallback(window, App::onCursorMoved);
-
 	// create vulkan instance
 	instance = new Instance();
 
-	// create surface
-	if(glfwCreateWindowSurface(instance->getVkInstance(), window, nullptr, &surface) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create surface");
-	}
+	mainWindow = new MainWindow(*instance);
 
 	// choose physical device
-	physicalDevice = PhysicalDevice::choosePhysicalDevice(*instance, surface);
+	physicalDevice = PhysicalDevice::choosePhysicalDevice(*instance, mainWindow->getVkSurface());
 
 	// create logical device
 	device = new Device(*physicalDevice);
 
 	// create swapchain
-	VkExtent2D preferredExtent = { WINDOW_WIDTH, WINDOW_HEIGHT };
-	swapchain = new Swapchain(*physicalDevice, *device, surface, preferredExtent);
+	VkExtent2D preferredExtent = { mainWindow->getWidth(), mainWindow->getHeight() };
+	swapchain = new Swapchain(*physicalDevice, *device, mainWindow->getVkSurface(), preferredExtent);
 
 	// create render pass
 	renderPass = new RenderPass(*device, swapchain->getVkFormat());
@@ -50,6 +31,11 @@ void App::init(const std::string& app_name) {
 
 	// create camera
 	camera = new Camera();
+	mainWindow->registerKeyPressedHandler([this](KeyCode keyCode) -> bool { return this->camera->keyPressed(keyCode); });
+	mainWindow->registerKeyReleasedHandler([this](KeyCode keyCode) -> bool { return this->camera->keyReleased(keyCode); });
+	mainWindow->registerMousePressedHandler([this](MouseButton button, int x, int y) -> bool { return this->camera->mousePressed(button, x, y); });
+	mainWindow->registerMouseReleasedHandler([this](MouseButton button, int x, int y) -> bool { return this->camera->mouseReleased(button); });
+	mainWindow->registerMouseMovedHandler([this](int x, int y) -> bool { return this->camera->mouseMoved(x, y); });
 
 	// create uniform buffer
 	uniformBuffer = new UniformBuffer(*device);
@@ -83,7 +69,7 @@ void App::init(const std::string& app_name) {
 }
 
 void App::run() {
-	while (!glfwWindowShouldClose(window)) {
+	while (mainWindow->isAlive()) {
 		glfwPollEvents();
 
 		camera->update();
@@ -93,7 +79,7 @@ void App::run() {
 		
 		uint32_t imageIndex = swapchain->aquireNextImage(*semaphoreImageAquired);
 		if (imageIndex == -1) {
-			recreateSwapchain();
+			// recreateSwapchain();
 			continue;
 		}
 
@@ -101,7 +87,7 @@ void App::run() {
 
 		imageIndex = swapchain->presentImage(imageIndex, *semaphoreRenderFinished);
 		if (imageIndex == -1) {
-			recreateSwapchain();
+			// recreateSwapchain();
 			continue;
 		}
 	}
@@ -132,72 +118,33 @@ void App::cleanup() {
 	delete instance;
 }
 
-void App::recreateSwapchain() {
-	vkDeviceWaitIdle(device->getVkDevice());
+// void App::recreateSwapchain() {
+// 	vkDeviceWaitIdle(device->getVkDevice());
 
-	delete commandBuffers;
-	delete framebuffers;
-	delete depthResource;
-	delete pipeline;
-	delete renderPass;
-	delete swapchain;
+// 	delete commandBuffers;
+// 	delete framebuffers;
+// 	delete depthResource;
+// 	delete pipeline;
+// 	delete renderPass;
+// 	delete swapchain;
 
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	VkExtent2D actualExtent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+// 	int width, height;
+// 	glfwGetWindowSize(window, &width, &height);
+// 	VkExtent2D actualExtent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
-	swapchain = new Swapchain(*physicalDevice, *device, surface, actualExtent);
-	renderPass = new RenderPass(*device, swapchain->getVkFormat());
-	pipeline = new Pipeline(*device, *renderPass, swapchain->getVkExtent(), *shader, *descriptorSet);
-	depthResource = new DepthResource(*device, swapchain->getVkExtent());
-	framebuffers = new Framebuffers(*device, *swapchain, *renderPass, depthResource->getImageView());
-	commandBuffers = new CommandBuffers(*device, *renderPass, *pipeline,
-		*framebuffers, model->getVertexBuffer(), model->getIndexBuffer(), *descriptorSet);
-}
+// 	swapchain = new Swapchain(*physicalDevice, *device, surface, actualExtent);
+// 	renderPass = new RenderPass(*device, swapchain->getVkFormat());
+// 	pipeline = new Pipeline(*device, *renderPass, swapchain->getVkExtent(), *shader, *descriptorSet);
+// 	depthResource = new DepthResource(*device, swapchain->getVkExtent());
+// 	framebuffers = new Framebuffers(*device, *swapchain, *renderPass, depthResource->getImageView());
+// 	commandBuffers = new CommandBuffers(*device, *renderPass, *pipeline,
+// 		*framebuffers, model->getVertexBuffer(), model->getIndexBuffer(), *descriptorSet);
+// }
 
-void App::onWindowResized(GLFWwindow* window, int width, int height) {
-	if (width == 0 || height == 0)
-		return;
+// void App::onWindowResized(GLFWwindow* window, int width, int height) {
+// 	if (width == 0 || height == 0)
+// 		return;
 
-	App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-	app->recreateSwapchain();
-}
-
-void App::onKeyAction(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-
-	switch (action) {
-		case GLFW_PRESS:
-			app->camera->keyPressed(key);
-			break;
-		case GLFW_RELEASE:
-			app->camera->keyReleased(key);
-			break;
-	}
-
-	if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-	}
-}
-
-void App::onMouseButtonAction(GLFWwindow* window, int button, int action, int mods) {
-	App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-
-	switch (action) {
-		case GLFW_PRESS:
-			app->camera->mouseButtonPressed(button, static_cast<int>(xpos), static_cast<int>(ypos));
-			break;
-		case GLFW_RELEASE:
-			app->camera->mouseButtonReleased(button);
-			break;
-	}
-}
-
-void App::onCursorMoved(GLFWwindow* window, double xpos, double ypos) {
-	App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-
-	app->camera->mouseMoved(static_cast<int>(xpos), static_cast<int>(ypos));
-}
+// 	App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+// 	app->recreateSwapchain();
+// }

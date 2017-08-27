@@ -10,6 +10,7 @@
 #include "framebuffers.hpp"
 #include "index_buffer.hpp"
 #include "instance.hpp"
+#include "main_window.hpp"
 #include "model.hpp"
 #include "model_loader.hpp"
 #include "physical_device.hpp"
@@ -26,8 +27,7 @@
 
 class App {
 public:
-	GLFWwindow* window;
-	VkSurfaceKHR surface;
+	MainWindow* mainWindow;
 
 	Instance* instance;
 	PhysicalDevice* physicalDevice;
@@ -50,7 +50,7 @@ public:
 	Semaphore* semaphoreRenderFinished;
 
 private:
-	void recreateSwapchain();
+	// void recreateSwapchain();
 	static void onWindowResized(GLFWwindow* window, int width, int height);
 	static void onKeyAction(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void onMouseButtonAction(GLFWwindow* window, int button, int action, int mods);
