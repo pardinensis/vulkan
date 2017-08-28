@@ -6,8 +6,8 @@ namespace Config {
 	const bool VALIDATION_LAYERS_ENABLED = true;
 
 	const char* const WINDOW_NAME = "";
-	const unsigned int WINDOW_WIDTH = 900;
-	const unsigned int WINDOW_HEIGHT = 600;
+	// const unsigned int WINDOW_WIDTH = 900;
+	// const unsigned int WINDOW_HEIGHT = 600;
 
 	const char* const APPLICATION_NAME = "";
 	const unsigned int APPLICATION_VERSION_MAJOR = 1;
@@ -26,4 +26,8 @@ namespace Config {
 	const glm::vec3 CAMERA_INITIAL_POS = {-0.5f, 0.1f, 0.0f };
 	const glm::vec3 CAMERA_INITIAL_DIR = { 1.0f, 0.0f, 0.0f };
 	const glm::vec3 CAMERA_INITIAL_UP  = { 0.0f, 1.0f, 0.0f };
+
+	const float PROJECTION_FOVY_DEGREES = 60.0f;
+	const float PROJECTION_NEAR_PLANE = 0.01f;
+	const float PROJECTION_FAR_PLANE = 10.0f;
 }

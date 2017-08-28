@@ -24,6 +24,8 @@ file(GLOB SOURCES ${SOURCE_DIR}/*.cpp )
 add_executable(${NAME} ${SOURCES} ${SHADERS})
 target_link_libraries(${NAME} glfw ${Vulkan_LIBRARY} ${XCB_LIBRARY})
 
+file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/screenshots")
+
 # compile shaders
 file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/shader")

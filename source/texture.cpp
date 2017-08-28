@@ -25,7 +25,7 @@ Texture::Texture(const Device& device, const std::string& filename)
 
 	// copy staging buffer to image
 	image->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	stagingBuffer.copyToImage(*image, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+	stagingBuffer.copyToImage(*image, static_cast<uint32_t>(width), static_cast<uint32_t>(height), VK_IMAGE_ASPECT_COLOR_BIT);
 	image->transitionLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// create image view

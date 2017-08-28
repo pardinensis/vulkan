@@ -12,6 +12,9 @@ private:
 	VkImage image;
 	VkDeviceMemory imageMemory;
 
+	uint32_t width;
+	uint32_t height;
+
 public:
 	Image(const Device& device, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
 		VkImageUsageFlags usage, VkMemoryPropertyFlags properties);
@@ -22,4 +25,6 @@ public:
 	const VkFormat& getVkFormat() const { return format; }
 	const VkImage& getVkImage() const { return image; }
 	const VkDeviceMemory& getVkDeviceMemory() const { return imageMemory; }
+	uint32_t getWidth() const { return width; }
+	uint32_t getHeight() const { return height; }
 };

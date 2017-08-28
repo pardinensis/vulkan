@@ -24,6 +24,8 @@ public:
 	const VkDeviceMemory& getVkDeviceMemory() const { return deviceMemory; }
 
 	void copyTo(const Buffer& destinationBuffer, VkDeviceSize size);
-	void copyToImage(const Image& destinationImage, uint32_t width, uint32_t height);
+	void copyToImage(const Image& destinationImage, uint32_t width, uint32_t height, VkImageAspectFlags aspectMask);
+	void copyFromImage(const Image& sourceImage, uint32_t width, uint32_t height, VkImageAspectFlags aspectMask);
 	void fill(VkDeviceSize size, void* data);
+	void retrieve(VkDeviceSize size, void* data);
 };

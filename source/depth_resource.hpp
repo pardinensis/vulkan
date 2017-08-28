@@ -18,5 +18,7 @@ public:
 	DepthResource(const Device& device, const VkExtent2D& extent);
 	~DepthResource();
 
+	std::vector<float> downloadDepthImage();
+
 	const ImageView& getImageView() const { return *imageView; }
 };

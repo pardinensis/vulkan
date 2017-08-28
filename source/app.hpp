@@ -15,6 +15,7 @@
 #include "model_loader.hpp"
 #include "physical_device.hpp"
 #include "pipeline.hpp"
+#include "projection.hpp"
 #include "render_pass.hpp"
 #include "semaphore.hpp"
 #include "shader.hpp"
@@ -43,6 +44,7 @@ public:
 	Texture* texture;
 	TextureSampler* textureSampler;
 	Camera* camera;
+	Projection* projection;
 	UniformBuffer* uniformBuffer;
 	DescriptorSet* descriptorSet;
 	CommandBuffers* commandBuffers;
@@ -50,11 +52,9 @@ public:
 	Semaphore* semaphoreRenderFinished;
 
 private:
+	void take3DScreenshot();
+
 	// void recreateSwapchain();
-	static void onWindowResized(GLFWwindow* window, int width, int height);
-	static void onKeyAction(GLFWwindow* window, int key, int scancode, int action, int mods);
-	static void onMouseButtonAction(GLFWwindow* window, int button, int action, int mods);
-	static void onCursorMoved(GLFWwindow* window, double xpos, double ypos);
 
 public:
 	void init(const std::string& app_name);

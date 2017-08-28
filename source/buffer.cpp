@@ -60,14 +60,14 @@ void Buffer::copyTo(const Buffer& destinationBuffer, VkDeviceSize size) {
 	endSingleTimeCommands(device, commandBuffer);
 }
 
-void Buffer::copyToImage(const Image &destinationImage, uint32_t width, uint32_t height) {
-VkCommandBuffer commandBuffer = beginSingleTimeCommands(device);
+void Buffer::copyToImage(const Image& destinationImage, uint32_t width, uint32_t height, VkImageAspectFlags aspectMask) {
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands(device);
 
 	VkBufferImageCopy copyRegion = {};
 	copyRegion.bufferOffset = 0;
 	copyRegion.bufferRowLength = 0;
 	copyRegion.bufferImageHeight = 0;
-	copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	copyRegion.imageSubresource.aspectMask = aspectMask;
 	copyRegion.imageSubresource.mipLevel = 0;
 	copyRegion.imageSubresource.baseArrayLayer = 0;
 	copyRegion.imageSubresource.layerCount = 1;
@@ -75,12 +75,37 @@ VkCommandBuffer commandBuffer = beginSingleTimeCommands(device);
 	copyRegion.imageExtent = { width, height, 1 };
 	vkCmdCopyBufferToImage(commandBuffer, buffer, destinationImage.getVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
-	endSingleTimeCommands(device, commandBuffer);	
+	endSingleTimeCommands(device, commandBuffer);
+}
+
+void Buffer::copyFromImage(const Image& sourceImage, uint32_t width, uint32_t height, VkImageAspectFlags aspectMask) {
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands(device);
+
+	VkBufferImageCopy copyRegion = {};
+	copyRegion.bufferOffset = 0;
+	copyRegion.bufferRowLength = 0;
+	copyRegion.bufferImageHeight = 0;
+	copyRegion.imageSubresource.aspectMask = aspectMask;
+	copyRegion.imageSubresource.mipLevel = 0;
+	copyRegion.imageSubresource.baseArrayLayer = 0;
+	copyRegion.imageSubresource.layerCount = 1;
+	copyRegion.imageOffset = { 0, 0, 0 };
+	copyRegion.imageExtent = { width, height, 1 };
+	vkCmdCopyImageToBuffer(commandBuffer, sourceImage.getVkImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1, &copyRegion);
+
+	endSingleTimeCommands(device, commandBuffer);
 }
 
 void Buffer::fill(VkDeviceSize size, void* data) {
 	void* bufferData;
 	vkMapMemory(device.getVkDevice(), deviceMemory, 0, size, 0, &bufferData);
 	std::memcpy(bufferData, data, static_cast<size_t>(size));
+	vkUnmapMemory(device.getVkDevice(), deviceMemory);
+}
+
+void Buffer::retrieve(VkDeviceSize size, void* data) {
+	void* bufferData;
+	vkMapMemory(device.getVkDevice(), deviceMemory, 0, size, 0, &bufferData);
+	std::memcpy(data, bufferData, static_cast<size_t>(size));
 	vkUnmapMemory(device.getVkDevice(), deviceMemory);
 }

@@ -37,6 +37,9 @@ void App::init(const std::string& app_name) {
 	mainWindow->registerMouseReleasedHandler([this](MouseButton button, int x, int y) -> bool { return this->camera->mouseReleased(button); });
 	mainWindow->registerMouseMovedHandler([this](int x, int y) -> bool { return this->camera->mouseMoved(x, y); });
 
+	// create projection
+	projection = new Projection(swapchain->getVkExtent());
+
 	// create uniform buffer
 	uniformBuffer = new UniformBuffer(*device);
 
@@ -66,6 +69,40 @@ void App::init(const std::string& app_name) {
 	// create semaphores
 	semaphoreImageAquired = new Semaphore(*device);
 	semaphoreRenderFinished = new Semaphore(*device);
+
+	// setup depth image download
+	mainWindow->registerMousePressedHandler([this](MouseButton button, int x, int y) -> bool {
+		if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+			this->take3DScreenshot();
+		}
+	});
+}
+
+void App::take3DScreenshot() {
+	std::vector<float> depthData = depthResource->downloadDepthImage();
+	glm::mat4 projectionMatrix = projection->getProjectionMatrix();
+	glm::mat4 inverseProjectionMatrix = glm::inverse(projectionMatrix);
+	VkExtent2D extent = swapchain->getVkExtent();
+
+	std::vector<glm::vec3> positions;
+	for (unsigned int yPixel = 0; yPixel < extent.height; ++yPixel) {
+		const float y = yPixel / (float) extent.height;
+		for (unsigned int xPixel = 0; xPixel < extent.width; ++xPixel) {
+			const float x = xPixel / (float) extent.width;
+			const float z = depthData[yPixel * extent.width + xPixel];
+			if (z < 1.0f) {
+				glm::vec3 viewSpacePoint = glm::unProject(glm::vec3(xPixel, yPixel, z), glm::mat4(),
+					projectionMatrix, glm::vec4(0, 0, extent.width, extent.height));
+				positions.push_back(viewSpacePoint);
+			}
+		}
+	}
+
+	std::ofstream os("../screenshots/bunny.obj");
+	for (const glm::vec3& v : positions) {
+		os << "v " << v.x << " " << v.y << " " << v.z << std::endl;
+	}
+	os.close();
 }
 
 void App::run() {
@@ -73,7 +110,7 @@ void App::run() {
 		glfwPollEvents();
 
 		camera->update();
-		uniformBuffer->update(swapchain->getVkExtent(), camera->getViewMatrix());
+		uniformBuffer->update(swapchain->getVkExtent(), camera->getViewMatrix(), projection->getProjectionMatrix());
 
 		vkQueueWaitIdle(device->getVkPresentQueue());
 		
@@ -84,6 +121,7 @@ void App::run() {
 		}
 
 		commandBuffers->submit(imageIndex, *semaphoreImageAquired, *semaphoreRenderFinished);
+
 
 		imageIndex = swapchain->presentImage(imageIndex, *semaphoreRenderFinished);
 		if (imageIndex == -1) {
@@ -107,11 +145,11 @@ void App::cleanup() {
 	delete swapchain;
 	
 	delete descriptorSet;
+	delete camera;
+	delete projection;
 	delete uniformBuffer;
 	delete textureSampler;
 	delete texture;
-	// delete indexBuffer;
-	// delete vertexBuffer;
 	delete model;
 	delete device;
 	delete physicalDevice;
