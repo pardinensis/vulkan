@@ -41,6 +41,9 @@ public:
 
 	void update();
 
+	const glm::vec3& getPos() const { return pos; }
+	const glm::vec3& getDir() const { return dir; }
+	const glm::vec3& getUp() const { return up; }
 	const glm::mat4& getViewMatrix() const { return viewMatrix; }
 
 private:

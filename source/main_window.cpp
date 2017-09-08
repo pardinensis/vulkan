@@ -10,12 +10,16 @@ MainWindow::MainWindow(const Instance& instance)
 	width = mode->width;
 	height = mode->height;
 
+	width = 800;
+	height = 600;
+
 	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+	glfwWindowHint(GLFW_RESIZABLE, false);
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	window = glfwCreateWindow(width, height, Config::WINDOW_NAME, monitor, nullptr);
+	window = glfwCreateWindow(width, height, Config::WINDOW_NAME, nullptr, nullptr);
 
 	setupCallbacks();
 

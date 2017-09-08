@@ -8,6 +8,9 @@ class Model {
 private:
 	const Device& device;
 
+	std::vector<Vertex> vertexData;
+	std::vector<uint32_t> indexData;
+
 	VertexBuffer* vertexBuffer;
 	IndexBuffer* indexBuffer;
 
@@ -19,6 +22,9 @@ public:
 	Model(const Device& device, const std::vector<Vertex>& vertexData, const std::vector<uint32_t> indexData);
 
 	~Model();
+
+	const std::vector<Vertex>& getVertexData() const { return vertexData; }
+	const std::vector<uint32_t>& getIndexData() const { return indexData; }
 
 	const VertexBuffer& getVertexBuffer() const { return *vertexBuffer; }
 	const IndexBuffer& getIndexBuffer() const { return *indexBuffer; }

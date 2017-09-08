@@ -5,6 +5,8 @@ Model::Model(const Device& device)
 
 Model::Model(const Device& device, const std::vector<Vertex>& vertexData, const std::vector<uint32_t> indexData)
 		: Model(device) {
+	this->vertexData = vertexData;
+	this->indexData = indexData;
 
 	vertexBuffer = new VertexBuffer(device, vertexData);
 	indexBuffer = new IndexBuffer(device, indexData);

@@ -80,6 +80,15 @@ Model* ModelLoader::loadObjFile(const Device &device, const std::string &filenam
 		}
 	}
 
+	glm::vec3 centerOfGravity;
+	for (const Vertex& v : vertices) {
+		centerOfGravity += v.position;
+	}
+	centerOfGravity *= (1.0f / vertices.size());
+	for (Vertex& v : vertices) {
+		v.position -= centerOfGravity;
+	}
+
 	if (!hasNormals) {
 		generateNormals(vertices, indices);
 	}

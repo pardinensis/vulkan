@@ -14,17 +14,27 @@ find_package(glfw3 3.2 REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(XCB REQUIRED)
 find_package(assimp REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(PCL 1.8 REQUIRED)
 
 add_definitions(-std=c++14)
 
 include_directories(${Vulkan_INCLUDE_DIRS})
 include_directories(${CONTRIB_DIR})
+include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${PCL_INCLUDE_DIRS})
 
 file(GLOB SOURCES ${SOURCE_DIR}/*.cpp )
 add_executable(${NAME} ${SOURCES} ${SHADERS})
+
 target_link_libraries(${NAME} glfw ${Vulkan_LIBRARY} ${XCB_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${PCL_COMMON_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${PCL_IO_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${PCL_FEATURES_LIBRARIES})
+
 
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/screenshots")
+
 
 # compile shaders
 file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag")

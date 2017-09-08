@@ -52,8 +52,6 @@ public:
 	Semaphore* semaphoreRenderFinished;
 
 private:
-	void take3DScreenshot();
-
 	// void recreateSwapchain();
 
 public:

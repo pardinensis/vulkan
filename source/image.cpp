@@ -91,8 +91,8 @@ void Image::transitionLayout(VkImageLayout oldLayout, VkImageLayout newLayout) {
 	else if (oldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
 		imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-		sourceStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		sourceStage = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 	}
 	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
 		imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
