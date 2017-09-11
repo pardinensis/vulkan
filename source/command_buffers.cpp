@@ -2,7 +2,8 @@
 
 
 CommandBuffers::CommandBuffers(const Device& device, const RenderPass& renderPass, const Pipeline& pipeline,
-		const Framebuffers& framebuffers, const VertexBuffer& vertexBuffer, const IndexBuffer& indexBuffer, const DescriptorSet& descriptorSet)
+		const Framebuffers& framebuffers, const VertexBuffer& vertexBuffer, const IndexBuffer& indexBuffer,
+		const InstanceBuffer& instanceBuffer, const DescriptorSet& descriptorSet)
 		: device(device) {
 	const VkDevice& vkDevice = device.getVkDevice();
 
@@ -45,9 +46,13 @@ CommandBuffers::CommandBuffers(const Device& device, const RenderPass& renderPas
 		VkBuffer vertexBuffers[] = { vertexBuffer.getBuffer().getVkBuffer() };
 		VkDeviceSize vertexOffsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, vertexOffsets);
+
+		VkBuffer instanceBuffers[] = { instanceBuffer.getBuffer().getVkBuffer() };
+		VkDeviceSize instanceOffsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffers[i], 1, 1, instanceBuffers, instanceOffsets);
 		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer.getBuffer().getVkBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getVkPipelineLayout(), 0, 1, &descriptorSet.getVkDescriptorSet(), 0, nullptr);
-		vkCmdDrawIndexed(commandBuffers[i], indexBuffer.getIndexCount(), 1, 0, 0, 0);
+		vkCmdDrawIndexed(commandBuffers[i], indexBuffer.getIndexCount(), instanceBuffer.getInstanceCount(), 0, 0, 0);
 		
 		vkCmdEndRenderPass(commandBuffers[i]);
 

@@ -10,10 +10,24 @@ Pipeline::Pipeline(const Device& device, const RenderPass& renderPass, const VkE
 	auto bindingDescription = Vertex::getBindingDescription();
 	auto attributeDescriptions = Vertex::getAttributeDescriptions();
 
+	// setup instance input format
+	VkVertexInputBindingDescription instanceBindingDescription = {};
+	instanceBindingDescription.binding = 1;
+	instanceBindingDescription.stride = sizeof(glm::vec3);
+	instanceBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+	std::vector<VkVertexInputBindingDescription> bindingDescriptions = { bindingDescription, instanceBindingDescription };
+
+	VkVertexInputAttributeDescription instanceModelAttributeDescription = {};
+	instanceModelAttributeDescription.binding = 1;
+	instanceModelAttributeDescription.location = 3;
+	instanceModelAttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
+	instanceModelAttributeDescription.offset = 0;
+	attributeDescriptions.push_back(instanceModelAttributeDescription);
+
 	VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
 	vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
-	vertexInputStateCreateInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+	vertexInputStateCreateInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 	vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());;
 	vertexInputStateCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
@@ -48,9 +62,9 @@ Pipeline::Pipeline(const Device& device, const RenderPass& renderPass, const VkE
 	rasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
 	rasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
-	rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+	rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL; // VK_POLYGON_MODE_FILL
 	rasterizationStateCreateInfo.lineWidth = 1.0f;
-	rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+	rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT; // VK_CULL_MODE_BACK_BIT
 	rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
 

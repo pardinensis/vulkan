@@ -4,6 +4,7 @@
 #include "index_buffer.hpp"
 #include "vertex_buffer.hpp"
 
+
 class Model {
 private:
 	const Device& device;

@@ -23,7 +23,7 @@ namespace Config {
 	const float CAMERA_SPEED_ANGULAR = 0.003f;
 	const float CAMERA_SPEED_FAST_FACTOR = 5.0f;
 
-	const glm::vec3 CAMERA_INITIAL_POS = {-0.5f, 0.1f, 0.0f };
+	const glm::vec3 CAMERA_INITIAL_POS = {-5.0f, 0.0f, 0.0f };
 	const glm::vec3 CAMERA_INITIAL_DIR = { 1.0f, 0.0f, 0.0f };
 	const glm::vec3 CAMERA_INITIAL_UP  = { 0.0f, 1.0f, 0.0f };
 

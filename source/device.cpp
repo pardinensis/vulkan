@@ -21,6 +21,7 @@ Device::Device(PhysicalDevice& physicalDevice)
 	// get device features
 	VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
 	physicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
+	physicalDeviceFeatures.fillModeNonSolid = VK_TRUE;
 
 	// get enabled layers
 	std::vector<const char*> enabledLayers;

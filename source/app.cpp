@@ -43,6 +43,9 @@ void App::init(const std::string& app_name) {
 	// create uniform buffer
 	uniformBuffer = new UniformBuffer(*device);
 
+	std::vector<glm::vec3> instanceData = { glm::vec3(0, 0, 2), glm::vec3(0, 0, -2) };
+	instanceBuffer = new InstanceBuffer(*device, instanceData);
+
 	// create texture
 	texture = new Texture(*device, "../texture/og.jpg");
 	textureSampler = new TextureSampler(*device);
@@ -64,7 +67,7 @@ void App::init(const std::string& app_name) {
 
 	// create command buffers
 	commandBuffers = new CommandBuffers(*device, *renderPass, *pipeline,
-		*framebuffers, model->getVertexBuffer(), model->getIndexBuffer(), *descriptorSet);
+		*framebuffers, model->getVertexBuffer(), model->getIndexBuffer(), *instanceBuffer, *descriptorSet);
 
 	// create semaphores
 	semaphoreImageAquired = new Semaphore(*device);
@@ -115,6 +118,7 @@ void App::cleanup() {
 	delete camera;
 	delete projection;
 	delete uniformBuffer;
+	delete instanceBuffer;
 	delete textureSampler;
 	delete texture;
 	delete model;

@@ -10,6 +10,7 @@
 #include "framebuffers.hpp"
 #include "index_buffer.hpp"
 #include "instance.hpp"
+#include "instance_buffer.hpp"
 #include "main_window.hpp"
 #include "model.hpp"
 #include "model_loader.hpp"
@@ -46,9 +47,11 @@ public:
 	Camera* camera;
 	Projection* projection;
 	UniformBuffer* uniformBuffer;
+	InstanceBuffer* instanceBuffer;
 	DescriptorSet* descriptorSet;
 	CommandBuffers* commandBuffers;
 	Semaphore* semaphoreImageAquired;
+	Semaphore* semaphoreRenderPass1Finished;
 	Semaphore* semaphoreRenderFinished;
 
 private:
